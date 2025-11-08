@@ -48,6 +48,7 @@ contract ChainCheck {
     error InvalidOwner();
     error ContractPaused();
     error ContractNotPaused();
+    error SerialNotInBatch();
     /**
      * @notice Product information structure
      * @param name Product name
@@ -73,6 +74,13 @@ contract ChainCheck {
      * @dev serialHash => hasBeenVerified
      */
     mapping(bytes32 => bool) public serialVerified;
+
+    /**
+     * @notice Mapping to track which batch a serial number belongs to
+     * @dev serialHash => batchId
+     * @dev Used to validate that a serial belongs to the claimed batch
+     */
+    mapping(bytes32 => uint256) public serialToBatch;
 
     /**
      * @notice Mapping to store product batch information
@@ -299,9 +307,11 @@ contract ChainCheck {
             imageUrl: imageUrl
         });
 
-        // Mark all serial hashes as unverified (ready for first verification)
-        // Note: We don't store all serials, just track them when verified
-        // This saves gas and allows for dynamic serial registration
+        // Store serial-to-batch mapping for validation
+        // This prevents attackers from verifying serials with wrong batch IDs
+        for (uint256 i = 0; i < serialHashes.length; i++) {
+            serialToBatch[serialHashes[i]] = batchId;
+        }
 
         totalProducts++;
 
@@ -327,6 +337,9 @@ contract ChainCheck {
     ) external whenNotPaused nonReentrant returns (bool) {
         if (batchId == 0) revert InvalidBatchId();
         if (!products[batchId].exists) revert BatchNotFound();
+        
+        // Validate that the serial hash belongs to the claimed batch
+        if (serialToBatch[serialHash] != batchId) revert SerialNotInBatch();
 
         // Check if this serial has been verified before
         bool isAuthentic = !serialVerified[serialHash];
@@ -471,6 +484,12 @@ contract ChainCheck {
                 continue;
             }
             if (!products[batchIds[i]].exists) {
+                results[i] = false;
+                continue;
+            }
+            
+            // Validate that the serial hash belongs to the claimed batch
+            if (serialToBatch[serialHashes[i]] != batchIds[i]) {
                 results[i] = false;
                 continue;
             }

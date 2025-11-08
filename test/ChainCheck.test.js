@@ -312,6 +312,34 @@ describe("ChainCheck", function () {
       ).to.be.revertedWithCustomError(chaincheck, "InvalidBatchId");
     });
 
+    it("Should reject verification when serial doesn't belong to batch", async function () {
+      // Register a second batch
+      const batchId2 = 2;
+      const serialHash2 = createSerialHash(batchId2, "SN002");
+      await chaincheck
+        .connect(manufacturer)
+        .registerProduct(batchId2, productName, productBrand, [serialHash2], "", "", "");
+
+      // Try to verify serialHash (from batchId 1) with batchId2
+      await expect(
+        chaincheck.connect(consumer).verify(serialHash, batchId2)
+      ).to.be.revertedWithCustomError(chaincheck, "SerialNotInBatch");
+
+      // Try to verify serialHash2 (from batchId2) with batchId
+      await expect(
+        chaincheck.connect(consumer).verify(serialHash2, batchId)
+      ).to.be.revertedWithCustomError(chaincheck, "SerialNotInBatch");
+    });
+
+    it("Should reject verification for unregistered serial", async function () {
+      // Create a serial hash that was never registered
+      const unregisteredSerial = createSerialHash(batchId, "UNREGISTERED");
+      
+      await expect(
+        chaincheck.connect(consumer).verify(unregisteredSerial, batchId)
+      ).to.be.revertedWithCustomError(chaincheck, "SerialNotInBatch");
+    });
+
     it("Should allow anyone to verify products", async function () {
       // Consumer can verify
       await chaincheck.connect(consumer).verify(serialHash, batchId);
@@ -406,6 +434,40 @@ describe("ChainCheck", function () {
         .registerProduct(batchId, productName, productBrand, largeSerialArray, "", "", "");
 
       expect(await chaincheck.totalProducts()).to.equal(1);
+    });
+
+    it("Should reject batchVerify when serials don't belong to batches", async function () {
+      // Register two batches
+      const batch1 = 10;
+      const batch2 = 11;
+      const serial1 = createSerialHash(batch1, "SN001");
+      const serial2 = createSerialHash(batch2, "SN002");
+      
+      await chaincheck
+        .connect(manufacturer)
+        .registerProduct(batch1, "Product 1", "Brand A", [serial1], "", "", "");
+      await chaincheck
+        .connect(manufacturer)
+        .registerProduct(batch2, "Product 2", "Brand B", [serial2], "", "", "");
+
+      // Try to verify serial1 with batch2 and serial2 with batch1
+      // batchVerify returns false for invalid serial-batch combinations (doesn't revert)
+      const tx = await chaincheck
+        .connect(consumer)
+        .batchVerify([serial1, serial2], [batch2, batch1]);
+      await tx.wait();
+      
+      // Call the function again to get the results (or check state)
+      // Since batchVerify doesn't emit events for invalid combinations, we check state
+      // Verify that no verification history was recorded (proves validation worked)
+      const history1 = await chaincheck.getVerificationHistory(serial1);
+      const history2 = await chaincheck.getVerificationHistory(serial2);
+      expect(history1.length).to.equal(0);
+      expect(history2.length).to.equal(0);
+      
+      // Verify serials are still not marked as verified
+      expect(await chaincheck.isSerialVerified(serial1)).to.be.false;
+      expect(await chaincheck.isSerialVerified(serial2)).to.be.false;
     });
   });
 
