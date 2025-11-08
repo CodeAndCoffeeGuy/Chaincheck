@@ -27,7 +27,7 @@ export function isMetaMaskInstalled(): boolean {
   }
   
   // Check if it's MetaMask specifically (has isMetaMask property)
-  return ethereum.isMetaMask === true || ethereum.providers?.some((p: any) => p.isMetaMask === true);
+  return (ethereum.isMetaMask === true) || (ethereum.providers?.some((p: any) => p.isMetaMask === true) ?? false);
 }
 
 /**
@@ -35,7 +35,7 @@ export function isMetaMaskInstalled(): boolean {
  * @returns Array of connected accounts
  */
 export async function connectWallet(): Promise<string[]> {
-  if (!isMetaMaskInstalled()) {
+  if (!isMetaMaskInstalled() || !window.ethereum) {
     throw new Error("MetaMask is not installed. Please install MetaMask to continue.");
   }
 
@@ -57,7 +57,7 @@ export async function connectWallet(): Promise<string[]> {
  * @returns Current account address or null
  */
 export async function getCurrentAccount(): Promise<string | null> {
-  if (!isMetaMaskInstalled()) {
+  if (!isMetaMaskInstalled() || !window.ethereum) {
     return null;
   }
 
@@ -76,7 +76,7 @@ export async function getCurrentAccount(): Promise<string | null> {
  * Switch to the correct network if needed
  */
 export async function switchNetwork(): Promise<void> {
-  if (!isMetaMaskInstalled()) {
+  if (!isMetaMaskInstalled() || !window.ethereum) {
     throw new Error("MetaMask is not installed");
   }
 
@@ -119,11 +119,11 @@ export async function switchNetwork(): Promise<void> {
  * @returns ethers provider
  */
 export function getProvider(): ethers.BrowserProvider {
-  if (!isMetaMaskInstalled()) {
+  if (!isMetaMaskInstalled() || !window.ethereum) {
     throw new Error("MetaMask is not installed");
   }
 
-  return new ethers.BrowserProvider(window.ethereum);
+  return new ethers.BrowserProvider(window.ethereum as ethers.Eip1193Provider);
 }
 
 /**
@@ -132,7 +132,8 @@ export function getProvider(): ethers.BrowserProvider {
  * @returns Contract instance
  */
 export function getContract(signer?: ethers.Signer): ethers.Contract {
-  if (CONTRACT_ADDRESS === "0x0000000000000000000000000000000000000000") {
+  const defaultAddress = "0x0000000000000000000000000000000000000000";
+  if (!CONTRACT_ADDRESS || CONTRACT_ADDRESS.toLowerCase() === defaultAddress.toLowerCase()) {
     throw new Error("Contract address not set. Please deploy the contract first.");
   }
 

@@ -163,7 +163,7 @@ function App() {
     }
 
     // Wait for DOM to update and element to be available
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
       const element = document.getElementById("qr-reader");
       if (!element) {
         console.error("QR reader element not found");
@@ -250,13 +250,15 @@ function App() {
             // Process the scanned QR code
             await processQRCode(decodedText);
           },
-          (errorMessage) => {
+          (errorMessage: any) => {
             setLoading(false);
             // Log errors for debugging
             // Handle both string and object error messages
             const errorStr = typeof errorMessage === "string" 
               ? errorMessage 
-              : errorMessage?.message || String(errorMessage);
+              : (errorMessage && typeof errorMessage === "object" && "message" in errorMessage)
+                ? String(errorMessage.message)
+                : String(errorMessage);
             
             // Check for camera-specific errors
             if (errorStr && (errorStr.includes("Permission") || errorStr.includes("NotAllowedError"))) {
