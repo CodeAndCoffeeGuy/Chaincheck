@@ -180,6 +180,38 @@ describe("ChainCheck", function () {
       ).to.be.revertedWithCustomError(chaincheck, "NoSerials");
     });
 
+    it("Should reject registration with too many serials", async function () {
+      const tooManySerials = [];
+      for (let i = 0; i < 10001; i++) {
+        tooManySerials.push(createSerialHash(batchId, `SN${i}`));
+      }
+
+      await expect(
+        chaincheck
+          .connect(manufacturer)
+          .registerProduct(batchId, productName, productBrand, tooManySerials, "", "", "")
+      ).to.be.revertedWithCustomError(chaincheck, "TooManySerials");
+    });
+
+    it("Should allow registration with large but valid number of serials", async function () {
+      // Test with 1000 serials (well below limit but still large)
+      // Testing with exactly 10000 would be too expensive in gas
+      const largeSerials = [];
+      for (let i = 0; i < 1000; i++) {
+        largeSerials.push(createSerialHash(batchId, `SN${i}`));
+      }
+
+      await chaincheck
+        .connect(manufacturer)
+        .registerProduct(batchId, productName, productBrand, largeSerials, "", "", "");
+      
+      expect(await chaincheck.totalProducts()).to.equal(1);
+      
+      // Verify the limit constant exists
+      const maxLimit = await chaincheck.MAX_SERIALS_PER_BATCH();
+      expect(maxLimit).to.equal(10000);
+    });
+
     it("Should reject duplicate batch registration", async function () {
       await chaincheck
         .connect(manufacturer)
@@ -434,6 +466,19 @@ describe("ChainCheck", function () {
         .registerProduct(batchId, productName, productBrand, largeSerialArray, "", "", "");
 
       expect(await chaincheck.totalProducts()).to.equal(1);
+    });
+
+    it("Should reject batchVerify with mismatched array lengths", async function () {
+      const serialHash = createSerialHash(batchId, serialNumber);
+      await chaincheck
+        .connect(manufacturer)
+        .registerProduct(batchId, productName, productBrand, [serialHash], "", "", "");
+
+      await expect(
+        chaincheck
+          .connect(consumer)
+          .batchVerify([serialHash], [batchId, batchId])
+      ).to.be.revertedWithCustomError(chaincheck, "ArraysLengthMismatch");
     });
 
     it("Should reject batchVerify when serials don't belong to batches", async function () {

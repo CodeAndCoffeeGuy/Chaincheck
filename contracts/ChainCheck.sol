@@ -49,6 +49,8 @@ contract ChainCheck {
     error ContractPaused();
     error ContractNotPaused();
     error SerialNotInBatch();
+    error ArraysLengthMismatch();
+    error TooManySerials();
     /**
      * @notice Product information structure
      * @param name Product name
@@ -62,8 +64,8 @@ contract ChainCheck {
     struct Product {
         string name;
         string brand;
-        bool exists;
         uint256 registeredAt;
+        bool exists;
         string ipfsHash;
         string description;
         string imageUrl;
@@ -127,6 +129,12 @@ contract ChainCheck {
      * @dev When paused, only owner functions work, verification is disabled
      */
     bool public paused;
+
+    /**
+     * @notice Maximum number of serials allowed per batch registration
+     * @dev Prevents gas limit issues and DoS attacks
+     */
+    uint256 public constant MAX_SERIALS_PER_BATCH = 10000;
 
     /**
      * @notice Event emitted when a product is registered
@@ -294,14 +302,15 @@ contract ChainCheck {
         if (bytes(name).length == 0) revert EmptyName();
         if (bytes(brand).length == 0) revert EmptyBrand();
         if (serialHashes.length == 0) revert NoSerials();
+        if (serialHashes.length > MAX_SERIALS_PER_BATCH) revert TooManySerials();
         if (products[batchId].exists) revert BatchExists();
 
         // Register the product batch
         products[batchId] = Product({
             name: name,
             brand: brand,
-            exists: true,
             registeredAt: block.timestamp,
+            exists: true,
             ipfsHash: ipfsHash,
             description: description,
             imageUrl: imageUrl
@@ -471,10 +480,7 @@ contract ChainCheck {
         bytes32[] memory serialHashes,
         uint256[] memory batchIds
     ) external whenNotPaused nonReentrant returns (bool[] memory results) {
-        require(
-            serialHashes.length == batchIds.length,
-            "ChainCheck: arrays length mismatch"
-        );
+        if (serialHashes.length != batchIds.length) revert ArraysLengthMismatch();
 
         results = new bool[](serialHashes.length);
 
