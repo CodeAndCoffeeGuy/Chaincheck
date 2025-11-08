@@ -127,6 +127,24 @@ export function getProvider(): ethers.BrowserProvider {
 }
 
 /**
+ * Check if contract is deployed at the configured address
+ * @returns True if contract code exists
+ */
+export async function isContractDeployed(): Promise<boolean> {
+  try {
+    // Use the network's RPC URL directly for checking deployment
+    // This works even if MetaMask isn't connected to the right network
+    const rpcUrl = CURRENT_NETWORK.rpcUrl;
+    const rpcProvider = new ethers.JsonRpcProvider(rpcUrl);
+    const code = await rpcProvider.getCode(CONTRACT_ADDRESS);
+    return code !== "0x" && code !== "0x0";
+  } catch (error) {
+    console.error("Error checking contract deployment:", error);
+    return false;
+  }
+}
+
+/**
  * Get a contract instance
  * @param signer Optional signer for write operations
  * @returns Contract instance
@@ -174,6 +192,8 @@ export async function verifyProduct(
   isAuthentic: boolean;
   productName: string;
   productBrand: string;
+  txHash?: string;
+  blockNumber?: number;
 }> {
   try {
     // Connect wallet and get signer
@@ -196,13 +216,62 @@ export async function verifyProduct(
       throw new Error("Product batch not found");
     }
 
+    // Check if serial was already verified before (to determine authenticity)
+    const wasVerifiedBefore = await contract.isSerialVerified(serialHash);
+    
     // Perform verification (this will mark serial as verified)
-    const isAuthentic = await contract.verify(serialHash, batchId);
+    // The verify function returns a transaction response
+    const tx = await contract.verify(serialHash, batchId);
+    
+    // Wait for transaction confirmation
+    const receipt = await tx.wait();
+    
+    // Check if transaction was successful
+    if (receipt.status !== 1) {
+      throw new Error("Transaction failed");
+    }
+    
+    // Parse the Verified event from the transaction receipt to get isAuthentic
+    // The event signature: Verified(bytes32 indexed serialHash, uint256 indexed batchId, bool isAuthentic, address verifier, uint256 timestamp)
+    let isAuthentic = false;
+    if (receipt.logs && receipt.logs.length > 0) {
+      try {
+        // Try to parse the Verified event
+        const verifiedEvent = receipt.logs.find((log: any) => {
+          try {
+            const parsed = contract.interface.parseLog(log);
+            return parsed && parsed.name === "Verified";
+          } catch {
+            return false;
+          }
+        });
+        
+        if (verifiedEvent) {
+          const parsed = contract.interface.parseLog(verifiedEvent);
+          if (parsed && parsed.args) {
+            isAuthentic = parsed.args[2]; // isAuthentic is the 3rd argument (index 2)
+          }
+        }
+      } catch (e) {
+        console.log("Could not parse Verified event, using fallback:", e);
+      }
+    }
+    
+    // Fallback: if we couldn't parse the event, use the before/after check
+    if (wasVerifiedBefore === undefined) {
+      // If serial wasn't verified before, it's authentic (first scan)
+      isAuthentic = !wasVerifiedBefore;
+    }
+    
+    // Get product info
+    const updatedProduct = await contract.getProduct(batchId);
 
     return {
       isAuthentic,
-      productName: product.name,
-      productBrand: product.brand,
+      productName: updatedProduct.name,
+      productBrand: updatedProduct.brand,
+      txHash: receipt.hash,
+      blockNumber: receipt.blockNumber,
     };
   } catch (error: any) {
     // Handle specific error messages
@@ -325,9 +394,21 @@ export async function isAuthorizedManufacturer(): Promise<boolean> {
       return false;
     }
 
+    // Check if contract is deployed first
+    const isDeployed = await isContractDeployed();
+    if (!isDeployed) {
+      console.warn("Contract not deployed at configured address");
+      return false;
+    }
+
     const contract = getContract();
     return await contract.authorizedMakers(account);
-  } catch (error) {
+  } catch (error: any) {
+    // Handle specific error for contract not deployed
+    if (error.code === "BAD_DATA" || error.message?.includes("could not decode")) {
+      console.warn("Contract not deployed or wrong address");
+      return false;
+    }
     console.error("Error checking authorization:", error);
     return false;
   }
@@ -340,17 +421,31 @@ export async function isAuthorizedManufacturer(): Promise<boolean> {
 export async function getStatistics(): Promise<{
   totalProducts: bigint;
   totalVerifications: bigint;
+  totalManufacturers: bigint;
 }> {
   try {
+    // Check if contract is deployed first
+    const isDeployed = await isContractDeployed();
+    if (!isDeployed) {
+      throw new Error("Contract not deployed. Please deploy the contract to the configured address first.");
+    }
+
     const contract = getContract();
     const totalProducts = await contract.totalProducts();
     const totalVerifications = await contract.totalVerifications();
+    const manufacturers = await contract.getManufacturers();
+    const totalManufacturers = BigInt(manufacturers.length);
 
     return {
       totalProducts,
       totalVerifications,
+      totalManufacturers,
     };
-  } catch (error) {
+  } catch (error: any) {
+    // Handle specific error for contract not deployed
+    if (error.code === "BAD_DATA" || error.message?.includes("could not decode")) {
+      throw new Error("Contract not deployed. Please deploy the contract to the configured address first.");
+    }
     throw new Error("Failed to fetch statistics: " + error);
   }
 }

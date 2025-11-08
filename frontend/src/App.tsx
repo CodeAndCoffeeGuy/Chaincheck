@@ -7,7 +7,10 @@ import {
   getCurrentAccount,
   connectWallet,
 } from "./utils/blockchain";
+import { CURRENT_NETWORK } from "./config";
 import ManufacturerDashboard from "./components/ManufacturerDashboard";
+import VerificationHistory from "./components/VerificationHistory";
+import AnalyticsDashboard from "./components/AnalyticsDashboard";
 import "./App.css";
 
 /**
@@ -27,12 +30,15 @@ function App() {
     message: string;
     productName?: string;
     productBrand?: string;
+    txHash?: string;
+    blockNumber?: number;
   } | null>(null);
   const [loading, setLoading] = useState(false);
   const [walletConnected, setWalletConnected] = useState(false);
+  const [txStatus, setTxStatus] = useState<"idle" | "pending" | "success" | "failed">("idle");
   const [scanner, setScanner] = useState<Html5QrcodeScanner | null>(null);
   const qrReaderRef = useRef<HTMLDivElement>(null);
-  const [activeTab, setActiveTab] = useState<"verify" | "dashboard">("verify");
+  const [activeTab, setActiveTab] = useState<"verify" | "dashboard" | "history" | "analytics">("verify");
 
   /**
    * Check wallet connection on component mount
@@ -360,17 +366,10 @@ function App() {
   };
 
   /**
-   * Process scanned QR code and verify on blockchain
-   * Expected format: "BATCH_ID:SERIAL_NUMBER" or JSON with batchId and serialNumber
+   * Validate QR code format offline (basic checks)
    */
-  const processQRCode = async (qrData: string) => {
-    setLoading(true);
-    setResult(null);
-
+  const validateQRCodeOffline = (qrData: string): { valid: boolean; batchId?: number; serialNumber?: string; error?: string } => {
     try {
-      // Parse QR code data
-      // Format 1: "BATCH_ID:SERIAL_NUMBER" (e.g., "1:SN123456")
-      // Format 2: JSON string with batchId and serialNumber
       let batchId: number;
       let serialNumber: string;
 
@@ -383,23 +382,70 @@ function App() {
         // If not JSON, try colon-separated format
         const parts = qrData.split(":");
         if (parts.length !== 2) {
-          throw new Error(
-            'Invalid QR code format. Expected "BATCH_ID:SERIAL_NUMBER" or JSON'
-          );
+          return {
+            valid: false,
+            error: 'Invalid QR code format. Expected "BATCH_ID:SERIAL_NUMBER" or JSON format.',
+          };
         }
         batchId = parseInt(parts[0]);
         serialNumber = parts[1];
       }
 
-      if (isNaN(batchId) || !serialNumber) {
-        throw new Error("Invalid batch ID or serial number");
+      if (isNaN(batchId) || batchId <= 0) {
+        return {
+          valid: false,
+          error: "Invalid batch ID. Batch ID must be a positive number.",
+        };
       }
+
+      if (!serialNumber || serialNumber.trim().length === 0) {
+        return {
+          valid: false,
+          error: "Invalid serial number. Serial number cannot be empty.",
+        };
+      }
+
+      return {
+        valid: true,
+        batchId,
+        serialNumber: serialNumber.trim(),
+      };
+    } catch (error: any) {
+      return {
+        valid: false,
+        error: `QR code validation error: ${error.message}`,
+      };
+    }
+  };
+
+  /**
+   * Process scanned QR code and verify on blockchain
+   * Expected format: "BATCH_ID:SERIAL_NUMBER" or JSON with batchId and serialNumber
+   */
+  const processQRCode = async (qrData: string) => {
+    setLoading(true);
+    setResult(null);
+
+    try {
+      // First, validate QR code format offline
+      const validation = validateQRCodeOffline(qrData);
+      if (!validation.valid || !validation.batchId || !validation.serialNumber) {
+        throw new Error(validation.error || "Invalid QR code format");
+      }
+
+      const { batchId, serialNumber } = validation;
 
       // Generate serial hash
       const serialHash = generateSerialHash(batchId, serialNumber);
 
+      // Set transaction status to pending
+      setTxStatus("pending");
+
       // Verify on blockchain
       const verificationResult = await verifyProduct(serialHash, batchId);
+
+      // Set transaction status to success
+      setTxStatus("success");
 
       // Set result based on verification
       if (verificationResult.isAuthentic) {
@@ -408,6 +454,8 @@ function App() {
           message: "Product verified as AUTHENTIC",
           productName: verificationResult.productName,
           productBrand: verificationResult.productBrand,
+          txHash: verificationResult.txHash,
+          blockNumber: verificationResult.blockNumber,
         });
       } else {
         setResult({
@@ -415,16 +463,48 @@ function App() {
           message: "WARNING: This product may be COUNTERFEIT",
           productName: verificationResult.productName,
           productBrand: verificationResult.productBrand,
+          txHash: verificationResult.txHash,
+          blockNumber: verificationResult.blockNumber,
         });
       }
     } catch (error: any) {
       console.error("Verification error:", error);
+      setTxStatus("failed");
+      
+      // Better error messages with user-friendly descriptions
+      let errorMessage = "Failed to verify product. Please try again.";
+      
+      if (error.message) {
+        const errorMsg = error.message.toLowerCase();
+        if (errorMsg.includes("user rejected") || errorMsg.includes("rejected")) {
+          errorMessage = "Transaction was rejected. Please approve the transaction in MetaMask to continue.";
+        } else if (errorMsg.includes("insufficient funds") || errorMsg.includes("gas")) {
+          errorMessage = "Insufficient funds for transaction. Please ensure you have enough ETH/MATIC for gas fees.";
+        } else if (errorMsg.includes("network") || errorMsg.includes("connection")) {
+          errorMessage = "Network connection error. Please check your internet connection and try again.";
+        } else if (errorMsg.includes("not found") || errorMsg.includes("batch")) {
+          errorMessage = "Product batch not found. The QR code may be invalid or the product may not be registered.";
+        } else if (errorMsg.includes("invalid") || errorMsg.includes("format")) {
+          errorMessage = error.message;
+        } else if (errorMsg.includes("revert") || errorMsg.includes("execution reverted")) {
+          errorMessage = "Transaction failed. The product may already be verified or the QR code may be invalid.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       setResult({
         status: "error",
-        message: error.message || "Failed to verify product. Please try again.",
+        message: errorMessage,
       });
     } finally {
       setLoading(false);
+      // Reset tx status after a delay
+      setTimeout(() => {
+        if (txStatus === "success" || txStatus === "failed") {
+          setTxStatus("idle");
+        }
+      }, 5000);
     }
   };
 
@@ -455,12 +535,34 @@ function App() {
               Verify Product
             </button>
             <button
+              className={`nav-tab ${activeTab === "history" ? "active" : ""}`}
+              onClick={() => setActiveTab("history")}
+            >
+              Verification History
+            </button>
+            <button
+              className={`nav-tab ${activeTab === "analytics" ? "active" : ""}`}
+              onClick={() => setActiveTab("analytics")}
+            >
+              Analytics
+            </button>
+            <button
               className={`nav-tab ${activeTab === "dashboard" ? "active" : ""}`}
               onClick={() => setActiveTab("dashboard")}
             >
               Manufacturer Dashboard
             </button>
           </div>
+        )}
+
+        {/* Verification History */}
+        {walletConnected && activeTab === "history" && (
+          <VerificationHistory />
+        )}
+
+        {/* Analytics Dashboard */}
+        {walletConnected && activeTab === "analytics" && (
+          <AnalyticsDashboard />
         )}
 
         {/* Manufacturer Dashboard */}
@@ -547,8 +649,16 @@ function App() {
               </div>
             )}
 
+            {/* Transaction Status Indicator */}
+            {txStatus === "pending" && (
+              <div className="tx-status tx-pending">
+                <div className="spinner"></div>
+                <p>Transaction pending... Waiting for confirmation</p>
+              </div>
+            )}
+
             {/* Loading State for verification */}
-            {loading && !scanning && (
+            {loading && !scanning && txStatus !== "pending" && (
               <div className="loading-section">
                 <div className="spinner"></div>
                 <p>Verifying on blockchain...</p>
@@ -569,9 +679,50 @@ function App() {
                     </p>
                   </div>
                 )}
-                <button onClick={reset} className="btn btn-primary">
-                  Scan Another Product
-                </button>
+                {result.txHash && (
+                  <div className="tx-info">
+                    <p>
+                      <strong>Transaction:</strong>{" "}
+                      <a
+                        href={`${CURRENT_NETWORK.name === "Localhost" ? "#" : `https://${CURRENT_NETWORK.name === "Mumbai Testnet" ? "mumbai.polygonscan.com" : "polygonscan.com"}/tx/${result.txHash}`}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="tx-link"
+                      >
+                        {result.txHash.substring(0, 10)}...{result.txHash.substring(result.txHash.length - 8)}
+                      </a>
+                    </p>
+                    {result.blockNumber && (
+                      <p>
+                        <strong>Block:</strong> {result.blockNumber.toString()}
+                      </p>
+                    )}
+                  </div>
+                )}
+                <div className="result-actions">
+                  <button onClick={reset} className="btn btn-primary">
+                    Scan Another Product
+                  </button>
+                  {result.status !== "error" && (
+                    <button
+                      onClick={() => {
+                        const shareText = `ChainCheck Verification Result:\n${result.message}\nProduct: ${result.productName}\nBrand: ${result.productBrand}\n${result.txHash ? `Transaction: ${result.txHash}` : ""}`;
+                        if (navigator.share) {
+                          navigator.share({
+                            title: "ChainCheck Verification",
+                            text: shareText,
+                          });
+                        } else {
+                          navigator.clipboard.writeText(shareText);
+                          alert("Verification result copied to clipboard!");
+                        }
+                      }}
+                      className="btn btn-secondary"
+                    >
+                      Share Result
+                    </button>
+                  )}
+                </div>
               </div>
             )}
           </>

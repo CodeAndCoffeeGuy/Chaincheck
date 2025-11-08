@@ -55,8 +55,12 @@ function ManufacturerDashboard() {
 
       const isAuth = await isAuthorizedManufacturer();
       setAuthorized(isAuth);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error checking authorization:", error);
+      // Don't show error if contract not deployed - it's expected during development
+      if (error.message?.includes("not deployed") || error.code === "BAD_DATA") {
+        console.log("Contract not deployed yet - this is normal if you haven't deployed to localhost");
+      }
       setAuthorized(false);
     }
   };
@@ -68,8 +72,12 @@ function ManufacturerDashboard() {
     try {
       const stats = await getStatistics();
       setStatistics(stats);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error loading statistics:", error);
+      // Don't show error if contract not deployed - it's expected during development
+      if (error.message?.includes("not deployed") || error.message?.includes("could not decode")) {
+        console.log("Contract not deployed yet - this is normal if you haven't deployed to localhost");
+      }
     }
   };
 
