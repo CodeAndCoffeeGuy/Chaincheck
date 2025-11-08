@@ -189,26 +189,41 @@ describe("ChainCheck", function () {
     });
 
     it("Should verify authentic product on first scan", async function () {
-      await expect(chaincheck.connect(consumer).verify(serialHash, batchId))
+      // First verification
+      const tx = await chaincheck.connect(consumer).verify(serialHash, batchId);
+      await expect(tx)
         .to.emit(chaincheck, "Verified")
         .withArgs(serialHash, batchId, true, consumer.address);
 
-      const isAuthentic = await chaincheck.verify(serialHash, batchId);
-      expect(isAuthentic).to.be.true;
+      // Check the result by reading the transaction receipt or checking state
+      const receipt = await tx.wait();
       expect(await chaincheck.isSerialVerified(serialHash)).to.be.true;
       expect(await chaincheck.totalVerifications()).to.equal(1);
+      
+      // Verify it returns false on second call (already verified)
+      const tx2 = await chaincheck.connect(consumer).verify(serialHash, batchId);
+      await expect(tx2)
+        .to.emit(chaincheck, "Verified")
+        .withArgs(serialHash, batchId, false, consumer.address);
     });
 
     it("Should detect fake product on second scan", async function () {
       // First scan (authentic)
-      await chaincheck.connect(consumer).verify(serialHash, batchId);
+      const tx1 = await chaincheck.connect(consumer).verify(serialHash, batchId);
+      await expect(tx1)
+        .to.emit(chaincheck, "Verified")
+        .withArgs(serialHash, batchId, true, consumer.address);
 
       // Second scan (fake - already verified)
-      const isAuthentic = await chaincheck
+      const tx2 = await chaincheck
         .connect(otherAccount)
         .verify(serialHash, batchId);
+      
+      await expect(tx2)
+        .to.emit(chaincheck, "Verified")
+        .withArgs(serialHash, batchId, false, otherAccount.address);
 
-      expect(isAuthentic).to.be.false;
+      expect(await chaincheck.isSerialVerified(serialHash)).to.be.true;
       expect(await chaincheck.totalVerifications()).to.equal(1);
     });
 

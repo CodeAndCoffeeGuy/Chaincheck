@@ -121,10 +121,11 @@ contract ChainCheck {
     }
 
     /**
-     * @notice Constructor sets the contract deployer as owner
+     * @notice Constructor sets the contract deployer as owner and authorizes them as manufacturer
      */
     constructor() {
         owner = msg.sender;
+        authorizedMakers[msg.sender] = true;
         emit ManufacturerAuthorized(msg.sender, true);
     }
 
