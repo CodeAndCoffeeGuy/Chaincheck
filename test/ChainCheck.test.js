@@ -237,40 +237,62 @@ describe("ChainCheck", function () {
     it("Should verify authentic product on first scan", async function () {
       // First verification
       const tx = await chaincheck.connect(consumer).verify(serialHash, batchId);
+      const receipt = await tx.wait();
+      const timestamp = (await ethers.provider.getBlock(receipt.blockNumber)).timestamp;
+      
       await expect(tx)
         .to.emit(chaincheck, "Verified")
-        .withArgs(serialHash, batchId, true, consumer.address);
+        .withArgs(serialHash, batchId, true, consumer.address, timestamp);
+
+      // Check verification history
+      const history = await chaincheck.getVerificationHistory(serialHash);
+      expect(history.length).to.equal(1);
+      expect(history[0].isAuthentic).to.be.true;
+      expect(history[0].verifier).to.equal(consumer.address);
+      expect(history[0].batchId).to.equal(batchId);
 
       // Check the result by reading the transaction receipt or checking state
-      const receipt = await tx.wait();
       expect(await chaincheck.isSerialVerified(serialHash)).to.be.true;
       expect(await chaincheck.totalVerifications()).to.equal(1);
       
       // Verify it returns false on second call (already verified)
       const tx2 = await chaincheck.connect(consumer).verify(serialHash, batchId);
+      const receipt2 = await tx2.wait();
+      const timestamp2 = (await ethers.provider.getBlock(receipt2.blockNumber)).timestamp;
       await expect(tx2)
         .to.emit(chaincheck, "Verified")
-        .withArgs(serialHash, batchId, false, consumer.address);
+        .withArgs(serialHash, batchId, false, consumer.address, timestamp2);
     });
 
     it("Should detect fake product on second scan", async function () {
       // First scan (authentic)
       const tx1 = await chaincheck.connect(consumer).verify(serialHash, batchId);
+      const receipt1 = await tx1.wait();
+      const timestamp1 = (await ethers.provider.getBlock(receipt1.blockNumber)).timestamp;
       await expect(tx1)
         .to.emit(chaincheck, "Verified")
-        .withArgs(serialHash, batchId, true, consumer.address);
+        .withArgs(serialHash, batchId, true, consumer.address, timestamp1);
 
       // Second scan (fake - already verified)
       const tx2 = await chaincheck
         .connect(otherAccount)
         .verify(serialHash, batchId);
+      const receipt2 = await tx2.wait();
+      const timestamp2 = (await ethers.provider.getBlock(receipt2.blockNumber)).timestamp;
       
       await expect(tx2)
         .to.emit(chaincheck, "Verified")
-        .withArgs(serialHash, batchId, false, otherAccount.address);
+        .withArgs(serialHash, batchId, false, otherAccount.address, timestamp2);
 
       expect(await chaincheck.isSerialVerified(serialHash)).to.be.true;
       expect(await chaincheck.totalVerifications()).to.equal(1);
+
+      // Check verification history has 2 records
+      const history = await chaincheck.getVerificationHistory(serialHash);
+      expect(history.length).to.equal(2);
+      expect(history[0].isAuthentic).to.be.true;
+      expect(history[1].isAuthentic).to.be.false;
+      expect(history[1].verifier).to.equal(otherAccount.address);
     });
 
     it("Should reject verification for non-existent batch", async function () {
@@ -296,6 +318,35 @@ describe("ChainCheck", function () {
         .connect(manufacturer)
         .registerProduct(2, productName, productBrand, [serialHash2], "", "", "");
       await chaincheck.connect(manufacturer).verify(serialHash2, 2);
+    });
+
+    it("Should track verification history", async function () {
+      // First verification
+      await chaincheck.connect(consumer).verify(serialHash, batchId);
+      
+      // Second verification
+      await chaincheck.connect(otherAccount).verify(serialHash, batchId);
+
+      // Check history
+      const history = await chaincheck.getVerificationHistory(serialHash);
+      expect(history.length).to.equal(2);
+      expect(history[0].isAuthentic).to.be.true;
+      expect(history[1].isAuthentic).to.be.false;
+      expect(history[0].verifier).to.equal(consumer.address);
+      expect(history[1].verifier).to.equal(otherAccount.address);
+
+      // Check verification count
+      const count = await chaincheck.getVerificationCount(serialHash);
+      expect(count).to.equal(2);
+    });
+
+    it("Should return empty history for unverified serial", async function () {
+      const unverifiedHash = createSerialHash(batchId, "UNVERIFIED");
+      const history = await chaincheck.getVerificationHistory(unverifiedHash);
+      expect(history.length).to.equal(0);
+      
+      const count = await chaincheck.getVerificationCount(unverifiedHash);
+      expect(count).to.equal(0);
     });
   });
 

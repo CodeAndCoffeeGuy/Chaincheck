@@ -119,13 +119,37 @@ contract ChainCheck {
      * @param batchId Product batch ID
      * @param isAuthentic Whether the product is authentic (first scan)
      * @param verifier Address that performed the verification
+     * @param timestamp Block timestamp of verification
      */
     event Verified(
         bytes32 indexed serialHash,
         uint256 indexed batchId,
         bool isAuthentic,
-        address verifier
+        address verifier,
+        uint256 timestamp
     );
+
+    /**
+     * @notice Verification record structure
+     * @param serialHash Hashed serial number
+     * @param batchId Product batch ID
+     * @param verifier Address that performed verification
+     * @param timestamp Block timestamp
+     * @param isAuthentic Whether it was authentic (first scan)
+     */
+    struct VerificationRecord {
+        bytes32 serialHash;
+        uint256 batchId;
+        address verifier;
+        uint256 timestamp;
+        bool isAuthentic;
+    }
+
+    /**
+     * @notice Mapping to store verification history
+     * @dev serialHash => array of verification records
+     */
+    mapping(bytes32 => VerificationRecord[]) public verificationHistory;
 
     /**
      * @notice Event emitted when a manufacturer is authorized
@@ -293,7 +317,17 @@ contract ChainCheck {
             totalVerifications++;
         }
 
-        emit Verified(serialHash, batchId, isAuthentic, msg.sender);
+        // Record verification history
+        uint256 timestamp = block.timestamp;
+        verificationHistory[serialHash].push(VerificationRecord({
+            serialHash: serialHash,
+            batchId: batchId,
+            verifier: msg.sender,
+            timestamp: timestamp,
+            isAuthentic: isAuthentic
+        }));
+
+        emit Verified(serialHash, batchId, isAuthentic, msg.sender, timestamp);
 
         return isAuthentic;
     }
@@ -427,7 +461,17 @@ contract ChainCheck {
                 totalVerifications++;
             }
 
-            emit Verified(serialHashes[i], batchIds[i], isAuthentic, msg.sender);
+            // Record verification history
+            uint256 verifyTimestamp = block.timestamp;
+            verificationHistory[serialHashes[i]].push(VerificationRecord({
+                serialHash: serialHashes[i],
+                batchId: batchIds[i],
+                verifier: msg.sender,
+                timestamp: verifyTimestamp,
+                isAuthentic: isAuthentic
+            }));
+
+            emit Verified(serialHashes[i], batchIds[i], isAuthentic, msg.sender, verifyTimestamp);
         }
     }
 
@@ -524,6 +568,49 @@ contract ChainCheck {
         if (bytes(imageUrl).length > 0) {
             products[batchId].imageUrl = imageUrl;
         }
+    }
+
+    /**
+     * @notice Get verification history for a serial number
+     * @param serialHash Hashed serial number
+     * @return records Array of verification records
+     */
+    function getVerificationHistory(bytes32 serialHash)
+        external
+        view
+        returns (VerificationRecord[] memory)
+    {
+        return verificationHistory[serialHash];
+    }
+
+    /**
+     * @notice Get verification count for a serial number
+     * @param serialHash Hashed serial number
+     * @return count Number of times this serial has been verified
+     */
+    function getVerificationCount(bytes32 serialHash)
+        external
+        view
+        returns (uint256)
+    {
+        return verificationHistory[serialHash].length;
+    }
+
+    /**
+     * @notice Get verification history for multiple serials
+     * @param serialHashes Array of hashed serial numbers
+     * @return records Array of verification record arrays
+     */
+    function getVerificationHistoryBatch(bytes32[] memory serialHashes)
+        external
+        view
+        returns (VerificationRecord[][] memory)
+    {
+        VerificationRecord[][] memory records = new VerificationRecord[][](serialHashes.length);
+        for (uint256 i = 0; i < serialHashes.length; i++) {
+            records[i] = verificationHistory[serialHashes[i]];
+        }
+        return records;
     }
 }
 
