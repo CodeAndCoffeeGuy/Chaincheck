@@ -33,19 +33,28 @@ const PRODUCTS_TO_REGISTER = [
     batchId: 1,
     name: "Premium Sneakers",
     brand: "Nike",
-    serials: ["SN001", "SN002", "SN003", "SN004", "SN005"]
+    serials: ["SN001", "SN002", "SN003", "SN004", "SN005"],
+    ipfsHash: "",
+    description: "",
+    imageUrl: ""
   },
   {
     batchId: 2,
     name: "Smart Watch",
     brand: "Apple",
-    serials: ["SW001", "SW002", "SW003"]
+    serials: ["SW001", "SW002", "SW003"],
+    ipfsHash: "",
+    description: "",
+    imageUrl: ""
   },
   {
     batchId: 3,
     name: "Wireless Earbuds",
     brand: "Sony",
-    serials: ["WE001", "WE002", "WE003", "WE004", "WE005", "WE006"]
+    serials: ["WE001", "WE002", "WE003", "WE004", "WE005", "WE006"],
+    ipfsHash: "",
+    description: "",
+    imageUrl: ""
   }
 ];
 
@@ -77,14 +86,21 @@ async function main() {
       generateSerialHash(product.batchId, serial)
     );
 
-    try {
-      // Register product
-      const tx = await contract.registerProduct(
-        product.batchId,
-        product.name,
-        product.brand,
-        serialHashes
-      );
+      try {
+        // Register product (with optional metadata)
+        const ipfsHash = product.ipfsHash || "";
+        const description = product.description || "";
+        const imageUrl = product.imageUrl || "";
+
+        const tx = await contract.registerProduct(
+          product.batchId,
+          product.name,
+          product.brand,
+          serialHashes,
+          ipfsHash,
+          description,
+          imageUrl
+        );
 
       console.log("  Transaction hash:", tx.hash);
       console.log("  Waiting for confirmation...");

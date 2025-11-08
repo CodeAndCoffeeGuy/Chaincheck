@@ -39,12 +39,18 @@ contract ChainCheck {
      * @param brand Brand name
      * @param exists Whether the product batch exists
      * @param registeredAt Timestamp when product was registered
+     * @param ipfsHash IPFS hash for product metadata (optional)
+     * @param description Product description (optional)
+     * @param imageUrl Product image URL (optional)
      */
     struct Product {
         string name;
         string brand;
         bool exists;
         uint256 registeredAt;
+        string ipfsHash;
+        string description;
+        string imageUrl;
     }
 
     /**
@@ -215,6 +221,9 @@ contract ChainCheck {
      * @param name Product name
      * @param brand Brand name
      * @param serialHashes Array of hashed serial numbers for this batch
+     * @param ipfsHash IPFS hash for product metadata (can be empty)
+     * @param description Product description (can be empty)
+     * @param imageUrl Product image URL (can be empty)
      * 
      * Note: Serial numbers should be hashed off-chain before calling this function
      * Example: keccak256(abi.encodePacked(batchId, serialNumber))
@@ -223,7 +232,10 @@ contract ChainCheck {
         uint256 batchId,
         string memory name,
         string memory brand,
-        bytes32[] memory serialHashes
+        bytes32[] memory serialHashes,
+        string memory ipfsHash,
+        string memory description,
+        string memory imageUrl
     ) external onlyMaker whenNotPaused {
         if (batchId == 0) revert InvalidBatchId();
         if (bytes(name).length == 0) revert EmptyName();
@@ -236,7 +248,10 @@ contract ChainCheck {
             name: name,
             brand: brand,
             exists: true,
-            registeredAt: block.timestamp
+            registeredAt: block.timestamp,
+            ipfsHash: ipfsHash,
+            description: description,
+            imageUrl: imageUrl
         });
 
         // Mark all serial hashes as unverified (ready for first verification)
@@ -290,6 +305,9 @@ contract ChainCheck {
      * @return brand Brand name
      * @return exists Whether the batch exists
      * @return registeredAt Registration timestamp
+     * @return ipfsHash IPFS hash for product metadata
+     * @return description Product description
+     * @return imageUrl Product image URL
      */
     function getProduct(
         uint256 batchId
@@ -300,11 +318,22 @@ contract ChainCheck {
             string memory name,
             string memory brand,
             bool exists,
-            uint256 registeredAt
+            uint256 registeredAt,
+            string memory ipfsHash,
+            string memory description,
+            string memory imageUrl
         )
     {
         Product memory product = products[batchId];
-        return (product.name, product.brand, product.exists, product.registeredAt);
+        return (
+            product.name,
+            product.brand,
+            product.exists,
+            product.registeredAt,
+            product.ipfsHash,
+            product.description,
+            product.imageUrl
+        );
     }
 
     /**
@@ -430,6 +459,9 @@ contract ChainCheck {
      * @return brands Array of brand names
      * @return existsArray Array of existence flags
      * @return registeredAtArray Array of registration timestamps
+     * @return ipfsHashes Array of IPFS hashes
+     * @return descriptions Array of descriptions
+     * @return imageUrls Array of image URLs
      */
     function getProductsBatch(uint256[] memory batchIds)
         external
@@ -438,7 +470,10 @@ contract ChainCheck {
             string[] memory names,
             string[] memory brands,
             bool[] memory existsArray,
-            uint256[] memory registeredAtArray
+            uint256[] memory registeredAtArray,
+            string[] memory ipfsHashes,
+            string[] memory descriptions,
+            string[] memory imageUrls
         )
     {
         uint256 length = batchIds.length;
@@ -446,6 +481,9 @@ contract ChainCheck {
         brands = new string[](length);
         existsArray = new bool[](length);
         registeredAtArray = new uint256[](length);
+        ipfsHashes = new string[](length);
+        descriptions = new string[](length);
+        imageUrls = new string[](length);
 
         for (uint256 i = 0; i < length; i++) {
             Product memory product = products[batchIds[i]];
@@ -453,6 +491,38 @@ contract ChainCheck {
             brands[i] = product.brand;
             existsArray[i] = product.exists;
             registeredAtArray[i] = product.registeredAt;
+            ipfsHashes[i] = product.ipfsHash;
+            descriptions[i] = product.description;
+            imageUrls[i] = product.imageUrl;
+        }
+    }
+
+    /**
+     * @notice Update product metadata (IPFS hash, description, image URL)
+     * @dev Only authorized manufacturers can update their products
+     * @param batchId Product batch ID
+     * @param ipfsHash New IPFS hash (empty string to keep existing)
+     * @param description New description (empty string to keep existing)
+     * @param imageUrl New image URL (empty string to keep existing)
+     */
+    function updateProductMetadata(
+        uint256 batchId,
+        string memory ipfsHash,
+        string memory description,
+        string memory imageUrl
+    ) external onlyMaker whenNotPaused {
+        if (batchId == 0) revert InvalidBatchId();
+        if (!products[batchId].exists) revert BatchNotFound();
+
+        // Update only non-empty fields
+        if (bytes(ipfsHash).length > 0) {
+            products[batchId].ipfsHash = ipfsHash;
+        }
+        if (bytes(description).length > 0) {
+            products[batchId].description = description;
+        }
+        if (bytes(imageUrl).length > 0) {
+            products[batchId].imageUrl = imageUrl;
         }
     }
 }

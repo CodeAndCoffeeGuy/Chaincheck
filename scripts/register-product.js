@@ -78,13 +78,20 @@ async function main() {
     return;
   }
 
-  // Register product
+  // Register product (with optional metadata)
+  const ipfsHash = process.env.IPFS_HASH || "";
+  const description = process.env.DESCRIPTION || "";
+  const imageUrl = process.env.IMAGE_URL || "";
+
   console.log("\nRegistering product...");
   const tx = await chaincheck.registerProduct(
     batchId,
     productName,
     productBrand,
-    serialHashes
+    serialHashes,
+    ipfsHash,
+    description,
+    imageUrl
   );
 
   console.log("Transaction hash:", tx.hash);

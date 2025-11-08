@@ -113,7 +113,7 @@ describe("ChainCheck", function () {
       await expect(
         chaincheck
           .connect(manufacturer)
-          .registerProduct(batchId, productName, productBrand, serialHashes)
+          .registerProduct(batchId, productName, productBrand, serialHashes, "", "", "")
       )
         .to.emit(chaincheck, "ProductRegistered")
         .withArgs(batchId, productName, productBrand, serialHashes.length);
@@ -125,11 +125,26 @@ describe("ChainCheck", function () {
       expect(await chaincheck.totalProducts()).to.equal(1);
     });
 
+    it("Should allow registration with metadata", async function () {
+      const ipfsHash = "QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco";
+      const description = "Premium quality sneakers with advanced technology";
+      const imageUrl = "https://example.com/images/sneakers.jpg";
+
+      await chaincheck
+        .connect(manufacturer)
+        .registerProduct(2, "Test Product", "Test Brand", serialHashes, ipfsHash, description, imageUrl);
+
+      const product = await chaincheck.getProduct(2);
+      expect(product.ipfsHash).to.equal(ipfsHash);
+      expect(product.description).to.equal(description);
+      expect(product.imageUrl).to.equal(imageUrl);
+    });
+
     it("Should reject registration from unauthorized address", async function () {
       await expect(
         chaincheck
           .connect(consumer)
-          .registerProduct(batchId, productName, productBrand, serialHashes)
+          .registerProduct(batchId, productName, productBrand, serialHashes, "", "", "")
       ).to.be.revertedWithCustomError(chaincheck, "NotAuthorized");
     });
 
@@ -137,7 +152,7 @@ describe("ChainCheck", function () {
       await expect(
         chaincheck
           .connect(manufacturer)
-          .registerProduct(0, productName, productBrand, serialHashes)
+          .registerProduct(0, productName, productBrand, serialHashes, "", "", "")
       ).to.be.revertedWithCustomError(chaincheck, "InvalidBatchId");
     });
 
@@ -145,7 +160,7 @@ describe("ChainCheck", function () {
       await expect(
         chaincheck
           .connect(manufacturer)
-          .registerProduct(batchId, "", productBrand, serialHashes)
+          .registerProduct(batchId, "", productBrand, serialHashes, "", "", "")
       ).to.be.revertedWithCustomError(chaincheck, "EmptyName");
     });
 
@@ -153,7 +168,7 @@ describe("ChainCheck", function () {
       await expect(
         chaincheck
           .connect(manufacturer)
-          .registerProduct(batchId, productName, "", serialHashes)
+          .registerProduct(batchId, productName, "", serialHashes, "", "", "")
       ).to.be.revertedWithCustomError(chaincheck, "EmptyBrand");
     });
 
@@ -161,20 +176,51 @@ describe("ChainCheck", function () {
       await expect(
         chaincheck
           .connect(manufacturer)
-          .registerProduct(batchId, productName, productBrand, [])
+          .registerProduct(batchId, productName, productBrand, [], "", "", "")
       ).to.be.revertedWithCustomError(chaincheck, "NoSerials");
     });
 
     it("Should reject duplicate batch registration", async function () {
       await chaincheck
         .connect(manufacturer)
-        .registerProduct(batchId, productName, productBrand, serialHashes);
+        .registerProduct(batchId, productName, productBrand, serialHashes, "", "", "");
 
       await expect(
         chaincheck
           .connect(manufacturer)
-          .registerProduct(batchId, productName, productBrand, serialHashes)
+          .registerProduct(batchId, productName, productBrand, serialHashes, "", "", "")
       ).to.be.revertedWithCustomError(chaincheck, "BatchExists");
+    });
+
+    it("Should allow updating product metadata", async function () {
+      await chaincheck
+        .connect(manufacturer)
+        .registerProduct(3, productName, productBrand, serialHashes, "", "", "");
+
+      const newIpfsHash = "QmNewHash123";
+      const newDescription = "Updated description";
+      const newImageUrl = "https://example.com/new-image.jpg";
+
+      await chaincheck
+        .connect(manufacturer)
+        .updateProductMetadata(3, newIpfsHash, newDescription, newImageUrl);
+
+      const product = await chaincheck.getProduct(3);
+      expect(product.ipfsHash).to.equal(newIpfsHash);
+      expect(product.description).to.equal(newDescription);
+      expect(product.imageUrl).to.equal(newImageUrl);
+    });
+
+    it("Should reject metadata update from unauthorized address", async function () {
+      await chaincheck
+        .connect(manufacturer)
+        .registerProduct(4, productName, productBrand, serialHashes, "", "", "");
+
+      await expect(
+        chaincheck
+          .connect(consumer)
+          .updateProductMetadata(4, "hash", "desc", "url")
+      ).to.be.revertedWithCustomError(chaincheck, "NotAuthorized");
     });
   });
 
@@ -185,7 +231,7 @@ describe("ChainCheck", function () {
       // Register a product before each verification test
       await chaincheck
         .connect(manufacturer)
-        .registerProduct(batchId, productName, productBrand, [serialHash]);
+        .registerProduct(batchId, productName, productBrand, [serialHash], "", "", "");
     });
 
     it("Should verify authentic product on first scan", async function () {
@@ -248,7 +294,7 @@ describe("ChainCheck", function () {
       const serialHash2 = createSerialHash(batchId, "SN002");
       await chaincheck
         .connect(manufacturer)
-        .registerProduct(2, productName, productBrand, [serialHash2]);
+        .registerProduct(2, productName, productBrand, [serialHash2], "", "", "");
       await chaincheck.connect(manufacturer).verify(serialHash2, 2);
     });
   });
@@ -258,7 +304,7 @@ describe("ChainCheck", function () {
       const serialHashes = [createSerialHash(batchId, serialNumber)];
       await chaincheck
         .connect(manufacturer)
-        .registerProduct(batchId, productName, productBrand, serialHashes);
+        .registerProduct(batchId, productName, productBrand, serialHashes, "", "", "");
     });
 
     it("Should return correct product information", async function () {
@@ -282,10 +328,10 @@ describe("ChainCheck", function () {
 
       await chaincheck
         .connect(manufacturer)
-        .registerProduct(1, "Product 1", "Brand A", batch1Serials);
+        .registerProduct(1, "Product 1", "Brand A", batch1Serials, "", "", "");
       await chaincheck
         .connect(manufacturer)
-        .registerProduct(2, "Product 2", "Brand B", batch2Serials);
+        .registerProduct(2, "Product 2", "Brand B", batch2Serials, "", "", "");
 
       expect(await chaincheck.totalProducts()).to.equal(2);
     });
@@ -298,7 +344,7 @@ describe("ChainCheck", function () {
 
       await chaincheck
         .connect(manufacturer)
-        .registerProduct(batchId, productName, productBrand, largeSerialArray);
+        .registerProduct(batchId, productName, productBrand, largeSerialArray, "", "", "");
 
       expect(await chaincheck.totalProducts()).to.equal(1);
     });
@@ -310,7 +356,7 @@ describe("ChainCheck", function () {
       const serialHashes = [createSerialHash(batchId, serialNumber)];
       await chaincheck
         .connect(manufacturer)
-        .registerProduct(batchId, productName, productBrand, serialHashes);
+        .registerProduct(batchId, productName, productBrand, serialHashes, "", "", "");
     });
 
     it("Should allow owner to pause contract", async function () {
@@ -354,7 +400,7 @@ describe("ChainCheck", function () {
       await expect(
         chaincheck
           .connect(manufacturer)
-          .registerProduct(2, "Test Product", "Test Brand", serialHashes)
+          .registerProduct(2, "Test Product", "Test Brand", serialHashes, "", "", "")
       ).to.be.revertedWithCustomError(chaincheck, "ContractPaused");
     });
 
