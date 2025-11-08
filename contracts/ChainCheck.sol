@@ -16,8 +16,23 @@ pragma solidity ^0.8.20;
  * - Only authorized manufacturers can register products
  * - Serial numbers are hashed to prevent guessing
  * - One-time verification prevents replay attacks
+ * - Reentrancy guard protection
  */
 contract ChainCheck {
+    /**
+     * @notice Reentrancy guard state
+     */
+    uint256 private _locked;
+
+    /**
+     * @notice Reentrancy guard modifier
+     */
+    modifier nonReentrant() {
+        require(_locked != 1, "ReentrancyGuard: reentrant call");
+        _locked = 1;
+        _;
+        _locked = 0;
+    }
     /**
      * @notice Custom errors for gas optimization
      */
@@ -86,6 +101,12 @@ contract ChainCheck {
      * @notice Total number of verifications performed
      */
     uint256 public totalVerifications;
+
+    /**
+     * @notice Mapping to track verification count per product batch
+     * @dev batchId => verification count
+     */
+    mapping(uint256 => uint256) public batchVerificationCount;
 
     /**
      * @notice Array to track all authorized manufacturers
@@ -215,7 +236,7 @@ contract ChainCheck {
     function authorizeManufacturer(
         address maker,
         bool authorized
-    ) external onlyOwner {
+    ) external onlyOwner nonReentrant {
         if (maker == address(0)) revert InvalidAddress();
         
         bool wasAuthorized = authorizedMakers[maker];
@@ -260,7 +281,7 @@ contract ChainCheck {
         string memory ipfsHash,
         string memory description,
         string memory imageUrl
-    ) external onlyMaker whenNotPaused {
+    ) external onlyMaker whenNotPaused nonReentrant {
         if (batchId == 0) revert InvalidBatchId();
         if (bytes(name).length == 0) revert EmptyName();
         if (bytes(brand).length == 0) revert EmptyBrand();
@@ -303,7 +324,7 @@ contract ChainCheck {
     function verify(
         bytes32 serialHash,
         uint256 batchId
-    ) external whenNotPaused returns (bool) {
+    ) external whenNotPaused nonReentrant returns (bool) {
         if (batchId == 0) revert InvalidBatchId();
         if (!products[batchId].exists) revert BatchNotFound();
 
@@ -315,6 +336,7 @@ contract ChainCheck {
         if (isAuthentic) {
             serialVerified[serialHash] = true;
             totalVerifications++;
+            batchVerificationCount[batchId]++;
         }
 
         // Record verification history
@@ -410,7 +432,7 @@ contract ChainCheck {
      * @dev Only current owner can call this
      * @param newOwner Address of the new owner
      */
-    function transferOwnership(address newOwner) external onlyOwner {
+    function transferOwnership(address newOwner) external onlyOwner nonReentrant {
         if (newOwner == address(0)) revert InvalidAddress();
         if (newOwner == owner) revert InvalidOwner();
         
@@ -435,7 +457,7 @@ contract ChainCheck {
     function batchVerify(
         bytes32[] memory serialHashes,
         uint256[] memory batchIds
-    ) external whenNotPaused returns (bool[] memory results) {
+    ) external whenNotPaused nonReentrant returns (bool[] memory results) {
         require(
             serialHashes.length == batchIds.length,
             "ChainCheck: arrays length mismatch"
@@ -459,6 +481,7 @@ contract ChainCheck {
             if (isAuthentic) {
                 serialVerified[serialHashes[i]] = true;
                 totalVerifications++;
+                batchVerificationCount[batchIds[i]]++;
             }
 
             // Record verification history
@@ -482,7 +505,7 @@ contract ChainCheck {
      *      - Product verification is disabled
      *      - Owner functions still work
      */
-    function pause() external onlyOwner whenNotPaused {
+    function pause() external onlyOwner whenNotPaused nonReentrant {
         paused = true;
         emit Paused(true);
     }
@@ -491,7 +514,7 @@ contract ChainCheck {
      * @notice Unpause the contract
      * @dev Only owner can unpause
      */
-    function unpause() external onlyOwner whenPaused {
+    function unpause() external onlyOwner whenPaused nonReentrant {
         paused = false;
         emit Paused(false);
     }
@@ -554,7 +577,7 @@ contract ChainCheck {
         string memory ipfsHash,
         string memory description,
         string memory imageUrl
-    ) external onlyMaker whenNotPaused {
+    ) external onlyMaker whenNotPaused nonReentrant {
         if (batchId == 0) revert InvalidBatchId();
         if (!products[batchId].exists) revert BatchNotFound();
 
