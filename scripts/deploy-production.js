@@ -47,7 +47,7 @@ async function main() {
 
   // Validate balance
   if (balance === 0n) {
-    console.error("❌ ERROR: Insufficient balance!");
+    console.error("[ERROR] Insufficient balance!");
     console.error("   Your wallet has 0 MATIC.");
     console.error("   Please fund your wallet with at least 0.1 MATIC to deploy.");
     console.error("   Wallet address:", deployerAddress);
@@ -68,7 +68,7 @@ async function main() {
   console.log("  Estimated Cost:", estimatedCostFormatted, "MATIC\n");
 
   if (balance < estimatedCost) {
-    console.error("❌ WARNING: Balance may be insufficient!");
+    console.error("[WARNING] Balance may be insufficient!");
     console.error("   Estimated cost:", estimatedCostFormatted, "MATIC");
     console.error("   Your balance:", balanceFormatted, "MATIC");
     console.error("   Please add more MATIC to your wallet.\n");
@@ -76,7 +76,7 @@ async function main() {
   }
 
   // Confirm deployment
-  console.log("✅ Prerequisites check passed!\n");
+  console.log("[OK] Prerequisites check passed!\n");
   console.log("Ready to deploy ChainCheck to Polygon Mainnet.");
   console.log("This will cost approximately", estimatedCostFormatted, "MATIC.\n");
 
@@ -90,7 +90,7 @@ async function main() {
   const contractAddress = await chaincheck.getAddress();
 
   console.log("\n" + "=".repeat(60));
-  console.log("  ✅ Deployment Successful!");
+  console.log("  [OK] Deployment Successful!");
   console.log("=".repeat(60));
   console.log("\nContract Address:", contractAddress);
   console.log("Network: Polygon Mainnet");
@@ -101,7 +101,7 @@ async function main() {
   const deploymentTx = chaincheck.deploymentTransaction();
   if (deploymentTx) {
     await deploymentTx.wait(5);
-    console.log("✅ Transaction confirmed!\n");
+    console.log("[OK] Transaction confirmed!\n");
   }
 
   // Verify contract on PolygonScan (if API key is set)
@@ -112,19 +112,19 @@ async function main() {
         address: contractAddress,
         constructorArguments: [],
       });
-      console.log("✅ Contract verified on PolygonScan!");
+      console.log("[OK] Contract verified on PolygonScan!");
       console.log("   View at: https://polygonscan.com/address/" + contractAddress + "\n");
     } catch (error) {
       if (error.message.includes("Already Verified")) {
-        console.log("✅ Contract already verified on PolygonScan.");
+        console.log("[OK] Contract already verified on PolygonScan.");
         console.log("   View at: https://polygonscan.com/address/" + contractAddress + "\n");
       } else {
-        console.log("⚠️  Verification failed:", error.message);
+        console.log("[WARN] Verification failed:", error.message);
         console.log("   You can verify manually at: https://polygonscan.com/address/" + contractAddress + "\n");
       }
     }
   } else {
-    console.log("⚠️  POLYGONSCAN_API_KEY not set. Skipping verification.");
+    console.log("[WARN] POLYGONSCAN_API_KEY not set. Skipping verification.");
     console.log("   To verify later, run:");
     console.log("   npx hardhat verify --network polygon", contractAddress + "\n");
   }
@@ -171,7 +171,7 @@ async function main() {
 
   const infoPath = path.join(__dirname, "..", "deployment-info.json");
   fs.writeFileSync(infoPath, JSON.stringify(deploymentInfo, null, 2));
-  console.log("✅ Deployment info saved to: deployment-info.json\n");
+  console.log("[OK] Deployment info saved to: deployment-info.json\n");
 
   console.log("=".repeat(60));
   console.log("  Contract Address");
@@ -185,7 +185,7 @@ main()
   .then(() => process.exit(0))
   .catch((error) => {
     console.error("\n" + "=".repeat(60));
-    console.error("  ❌ Deployment Failed");
+    console.error("  [ERROR] Deployment Failed");
     console.error("=".repeat(60));
     console.error("\nError:", error.message);
     if (error.transaction) {

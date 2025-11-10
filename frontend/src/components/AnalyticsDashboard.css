@@ -1,18 +1,23 @@
 .analytics-dashboard {
-  padding: 30px;
-  background: #2d2d2d;
-  border-radius: 12px;
+  padding: 32px;
+  background: #1a1a1a;
+  border-radius: 16px;
   margin: 20px 0;
+  border: 1px solid #2a2a2a;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
 }
 
 .analytics-dashboard h2 {
-  color: #e0e0e0;
-  margin-bottom: 10px;
+  color: #ffffff;
+  margin-bottom: 8px;
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.5px;
 }
 
 .analytics-dashboard .subtitle {
-  color: #cccccc;
-  margin-bottom: 30px;
+  color: #a0a0a0;
+  margin-bottom: 32px;
   font-size: 0.95rem;
 }
 
@@ -24,17 +29,19 @@
 }
 
 .stat-card {
-  background: #1a1a1a;
-  padding: 25px;
+  background: #0f0f0f;
+  padding: 24px;
   border-radius: 12px;
-  border: 1px solid #444;
+  border: 1px solid #2a2a2a;
   text-align: center;
-  transition: transform 0.2s, border-color 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .stat-card:hover {
-  transform: translateY(-5px);
-  border-color: #ff8c42;
+  transform: translateY(-4px);
+  border-color: #ff6b35;
+  box-shadow: 0 4px 16px rgba(255, 107, 53, 0.2);
 }
 
 .stat-icon {
@@ -81,9 +88,21 @@
 }
 
 @media (max-width: 768px) {
+  .analytics-dashboard {
+    padding: 24px 20px;
+  }
+
+  .analytics-dashboard h2 {
+    font-size: 1.75rem;
+  }
+
   .stats-grid {
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+  }
+
+  .stat-card {
+    padding: 20px 16px;
   }
 
   .stat-value {
@@ -92,6 +111,37 @@
 
   .stat-icon {
     font-size: 2rem;
+  }
+
+  .stat-label {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .analytics-dashboard {
+    padding: 20px 16px;
+  }
+
+  .analytics-dashboard h2 {
+    font-size: 1.5rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 18px 14px;
+  }
+
+  .stat-value {
+    font-size: 1.75rem;
+  }
+
+  .stat-icon {
+    font-size: 1.75rem;
   }
 }
 

@@ -1,6 +1,6 @@
 /**
  * ChainCheck Application Styles
- * Professional minimalistic dark theme
+ * Professional modern dark theme with premium UX
  */
 
 * {
@@ -10,7 +10,6 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Prevent text selection on buttons for better mobile UX */
 button, a.btn {
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -24,11 +23,10 @@ body {
     "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #0f0f0f;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
   min-height: 100vh;
   color: #f5f5f5;
   line-height: 1.6;
-  /* Mobile optimizations */
   -webkit-overflow-scrolling: touch;
   overflow-x: hidden;
   position: relative;
@@ -38,470 +36,486 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 24px 20px;
-  /* Mobile safe area support */
-  padding-left: max(20px, env(safe-area-inset-left));
-  padding-right: max(20px, env(safe-area-inset-right));
-  padding-top: max(24px, env(safe-area-inset-top));
-  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  padding: 32px 24px;
+  padding-left: max(24px, env(safe-area-inset-left));
+  padding-right: max(24px, env(safe-area-inset-right));
+  padding-top: max(32px, env(safe-area-inset-top));
+  padding-bottom: max(32px, env(safe-area-inset-bottom));
 }
 
 .app-header {
-  text-align: center;
-  margin-bottom: 32px;
-  padding: 16px 0;
+  margin-bottom: 48px;
+  padding: 24px 0;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.app-logo {
+  height: 60px;
+  width: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.header-text {
+  text-align: left;
 }
 
 .app-header h1 {
-  font-size: 2.5rem;
-  font-weight: 600;
-  margin-bottom: 8px;
-  letter-spacing: -0.5px;
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  letter-spacing: -1px;
+  line-height: 1.1;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0;
+}
+
+.title-chain {
   color: #ffffff;
-  line-height: 1.2;
+  background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.title-check {
+  color: #FF6B35;
 }
 
 .subtitle {
-  font-size: 1rem;
+  font-size: 1.125rem;
   color: #a0a0a0;
   font-weight: 400;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.3px;
 }
 
 .app-main {
   flex: 1;
   background: #1a1a1a;
-  border-radius: 16px;
-  padding: 32px;
-  margin-bottom: 24px;
+  border-radius: 24px;
+  padding: 48px;
+  margin-bottom: 32px;
   border: 1px solid #2a2a2a;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
+              0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  backdrop-filter: blur(10px);
 }
 
 .wallet-section,
-.scan-section,
-.scanner-section,
-.loading-section,
-.result-section {
+.scan-section {
   text-align: center;
-  margin: 30px 0;
+  margin: 40px 0;
+  padding: 32px;
 }
 
 .wallet-section p,
 .scan-section p {
-  margin-bottom: 20px;
-  font-size: 1.1rem;
+  margin-bottom: 24px;
+  font-size: 1.125rem;
   color: #e0e0e0;
+  font-weight: 400;
+  line-height: 1.6;
 }
 
-.btn {
-  padding: 12px 24px;
-  font-size: 0.95rem;
+/* Scanner Section - Professional Design */
+.scanner-section {
+  width: 100%;
+  margin: 32px 0;
+}
+
+.scanner-container {
+  background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+  border-radius: 24px;
+  padding: 40px;
+  border: 1px solid #2a2a2a;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
+              0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.scanner-header {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.scanner-header h3 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
+}
+
+.scanner-header p {
+  font-size: 1rem;
+  color: #a0a0a0;
+  margin: 0;
+  font-weight: 400;
+}
+
+.scanner-loading {
+  padding: 60px 20px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.scanner-loading p {
+  color: #a0a0a0;
+  margin-top: 20px;
+  font-size: 1rem;
   font-weight: 500;
+}
+
+.qr-reader-wrapper {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto 32px;
+  min-height: 500px;
+  background: #000000;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  border: 2px solid #2a2a2a;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8),
+              inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.qr-reader-wrapper #qr-reader {
+  width: 100%;
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-cancel-scan {
+  margin: 0 auto;
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  font-size: 1rem;
+  padding: 14px 32px;
+  min-height: 52px;
+  border-radius: 12px;
+  align-self: center;
+}
+
+/* Buttons - Premium Design */
+.btn {
+  padding: 14px 32px;
+  font-size: 1rem;
+  font-weight: 600;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  min-height: 44px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 52px;
   touch-action: manipulation;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   text-decoration: none;
   text-align: center;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.3px;
   white-space: nowrap;
-}
-
-.btn-primary {
-  background: #ff6b35;
-  color: #ffffff;
-  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.25);
-}
-
-.btn-primary:hover {
-  background: #ff7a47;
-  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.35);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-  box-shadow: 0 1px 4px rgba(255, 107, 53, 0.25);
-}
-
-.btn-secondary {
-  background: transparent;
-  color: #e0e0e0;
-  border: 1px solid #3a3a3a;
-}
-
-.btn-secondary:hover {
-  background: #252525;
-  border-color: #4a4a4a;
-}
-
-.btn-secondary:active {
-  background: #1f1f1f;
-}
-
-.btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  transform: none;
-  pointer-events: none;
-}
-
-.scanner-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-#qr-reader {
-  width: 100%;
-  max-width: 400px;
-  margin: 20px 0;
-  background: #1a1a1a;
-  border-radius: 12px;
-  padding: 20px;
-  min-height: 300px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   position: relative;
   overflow: hidden;
 }
 
-/* QR Scanner library styles - Hide default UI and customize */
-#qr-reader__dashboard {
-  width: 100%;
-  background: transparent;
-}
-
-#qr-reader__dashboard_section {
-  background: transparent;
-  padding: 0;
-  margin: 0;
-}
-
-/* Hide the "Scan an Image File" button */
-#qr-reader__dashboard_section_csr {
-  display: none !important;
-}
-
-/* Style the camera selection dropdown */
-#qr-reader__camera_selection {
-  background: #2d2d2d !important;
-  color: #e0e0e0 !important;
-  border: 1px solid #3d3d3d !important;
-  border-radius: 8px !important;
-  padding: 10px 15px !important;
-  margin-bottom: 15px !important;
-  font-size: 0.9rem !important;
-  width: 100% !important;
-  cursor: pointer !important;
-  transition: all 0.3s ease !important;
-}
-
-#qr-reader__camera_selection:hover {
-  border-color: #ff8c42 !important;
-  background: #3d3d3d !important;
-}
-
-#qr-reader__camera_selection:focus {
-  outline: none !important;
-  border-color: #ff8c42 !important;
-  box-shadow: 0 0 0 2px rgba(255, 140, 66, 0.2) !important;
-}
-
-/* Style the scan region */
-#qr-reader__scan_region {
-  background: #1a1a1a !important;
-  border-radius: 12px !important;
-  overflow: hidden !important;
-  position: relative !important;
-}
-
-#qr-reader__scan_region video {
-  width: 100% !important;
-  height: auto !important;
-  border-radius: 8px !important;
-  background: #000 !important;
-}
-
-/* Style the scanning box overlay */
-#qr-reader__scan_region canvas {
-  border-radius: 8px !important;
-}
-
-/* Hide or style the "Camera based scan" text */
-#qr-reader__dashboard_section_swaplink {
-  display: none !important;
-}
-
-/* Custom styling for any buttons in the scanner */
-#qr-reader button,
-#qr-reader__dashboard button {
-  background: linear-gradient(135deg, #ff8c42 0%, #ff6b35 100%) !important;
-  color: white !important;
-  border: none !important;
-  border-radius: 8px !important;
-  padding: 10px 20px !important;
-  font-weight: 600 !important;
-  cursor: pointer !important;
-  transition: all 0.3s ease !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.5px !important;
-  font-size: 0.9rem !important;
-}
-
-#qr-reader button:hover,
-#qr-reader__dashboard button:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 15px rgba(255, 140, 66, 0.4) !important;
-}
-
-/* Style any labels or text in the scanner */
-#qr-reader label,
-#qr-reader__dashboard label {
-  color: #e0e0e0 !important;
-  font-size: 0.9rem !important;
-}
-
-/* Hide file input if it appears */
-#qr-reader input[type="file"] {
-  display: none !important;
-}
-
-/* Style the scanning border/overlay - will be dynamically sized */
-#qr-reader__scan_region::before {
-  content: "";
+.btn::before {
+  content: '';
   position: absolute;
   top: 50%;
   left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
   transform: translate(-50%, -50%);
-  width: min(250px, calc(100% - 40px));
-  height: min(250px, calc(100% - 40px));
-  border: 3px solid #ff8c42;
-  border-radius: 12px;
-  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5),
-              0 0 20px rgba(255, 140, 66, 0.3);
-  pointer-events: none;
-  z-index: 10;
+  transition: width 0.6s, height 0.6s;
 }
 
-/* Corner indicators for scanning box */
-#qr-reader__scan_region::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: min(250px, calc(100% - 40px));
-  height: min(250px, calc(100% - 40px));
-  border: none;
-  pointer-events: none;
-  z-index: 11;
-  box-shadow: 
-    /* Top-left corner */
-    -10px -10px 0 -5px #ff8c42,
-    -10px -10px 0 -3px transparent,
-    /* Top-right corner */
-    calc(100% + 10px) -10px 0 -5px #ff8c42,
-    calc(100% + 10px) -10px 0 -3px transparent,
-    /* Bottom-left corner */
-    -10px calc(100% + 10px) 0 -5px #ff8c42,
-    -10px calc(100% + 10px) 0 -3px transparent,
-    /* Bottom-right corner */
-    calc(100% + 10px) calc(100% + 10px) 0 -5px #ff8c42,
-    calc(100% + 10px) calc(100% + 10px) 0 -3px transparent;
+.btn:hover::before {
+  width: 300px;
+  height: 300px;
 }
 
+.btn-primary {
+  background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(255, 107, 53, 0.4),
+              0 0 0 1px rgba(255, 107, 53, 0.2) inset;
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #ff7a47 0%, #ff9d5c 100%);
+  box-shadow: 0 6px 24px rgba(255, 107, 53, 0.5),
+              0 0 0 1px rgba(255, 107, 53, 0.3) inset;
+  transform: translateY(-2px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  color: #e0e0e0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.btn-secondary:active {
+  transform: translateY(0);
+}
+
+/* Loading Spinner */
 .loading-section {
-  padding: 40px;
+  padding: 60px 32px;
+  text-align: center;
 }
 
 .spinner {
-  border: 3px solid rgba(255, 107, 53, 0.2);
-  border-top: 3px solid #ff6b35;
+  border: 4px solid rgba(255, 107, 53, 0.2);
+  border-top: 4px solid #ff6b35;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   animation: spin 0.8s linear infinite;
-  margin: 0 auto 16px;
+  margin: 0 auto 20px;
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-.loading-section {
-  padding: 32px 20px;
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .loading-section p {
-  color: #b0b0b0;
-  font-size: 0.9rem;
-  font-weight: 400;
+  color: #a0a0a0;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-top: 16px;
 }
 
+/* Results Section */
 .result-section {
-  padding: 28px;
-  border-radius: 12px;
-  margin: 24px 0;
+  padding: 40px;
+  border-radius: 20px;
+  margin: 32px 0;
+  text-align: center;
   border: 1px solid;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.result-section h2 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 24px;
+  letter-spacing: -0.5px;
 }
 
 .result-authentic {
-  background: rgba(34, 197, 94, 0.08);
-  border-color: rgba(34, 197, 94, 0.3);
+  background: linear-gradient(135deg, rgba(40, 167, 69, 0.15) 0%, rgba(40, 167, 69, 0.05) 100%);
+  border-color: rgba(40, 167, 69, 0.3);
+  color: #4ade80;
+}
+
+.result-authentic h2 {
   color: #4ade80;
 }
 
 .result-fake {
-  background: rgba(239, 68, 68, 0.08);
-  border-color: rgba(239, 68, 68, 0.3);
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.15) 0%, rgba(220, 53, 69, 0.05) 100%);
+  border-color: rgba(220, 53, 69, 0.3);
+  color: #f87171;
+}
+
+.result-fake h2 {
   color: #f87171;
 }
 
 .result-error {
-  background: rgba(255, 107, 53, 0.08);
-  border-color: rgba(255, 107, 53, 0.3);
-  color: #ffb84d;
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.15) 0%, rgba(220, 53, 69, 0.05) 100%);
+  border-color: rgba(220, 53, 69, 0.3);
+  color: #f87171;
 }
 
-.result-section h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 20px;
-  line-height: 1.4;
+.result-error h2 {
+  color: #f87171;
 }
 
 .product-info {
-  background: rgba(255, 255, 255, 0.03);
-  padding: 20px;
-  border-radius: 8px;
-  margin: 20px 0;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  padding: 24px;
+  margin: 24px 0;
   text-align: left;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .product-info p {
-  margin: 8px 0;
-  font-size: 0.95rem;
-  color: #d0d0d0;
-  line-height: 1.6;
+  margin: 12px 0;
+  font-size: 1rem;
+  color: #e0e0e0;
+  line-height: 1.8;
 }
 
-.tx-status {
-  padding: 16px 20px;
-  border-radius: 8px;
-  margin: 20px 0;
-  text-align: center;
-  border: 1px solid;
-}
-
-.tx-pending {
-  background: rgba(255, 107, 53, 0.08);
-  border-color: rgba(255, 107, 53, 0.3);
-  color: #ffb84d;
+.product-info strong {
+  color: #ffffff;
+  font-weight: 600;
+  margin-right: 8px;
 }
 
 .tx-info {
-  background: rgba(255, 255, 255, 0.03);
-  padding: 16px;
-  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  padding: 20px;
   margin: 20px 0;
   text-align: left;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  font-size: 0.875rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .tx-info p {
-  margin: 6px 0;
-  color: #d0d0d0;
-  word-break: break-all;
-  line-height: 1.5;
+  margin: 8px 0;
+  font-size: 0.95rem;
+  color: #e0e0e0;
+  font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+}
+
+.tx-info strong {
+  color: #ffffff;
+  font-weight: 600;
+  margin-right: 8px;
 }
 
 .tx-link {
   color: #ff6b35;
   text-decoration: none;
-  font-family: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
-  font-size: 0.85rem;
+  transition: color 0.2s;
 }
 
 .tx-link:hover {
+  color: #ff8c42;
   text-decoration: underline;
-  color: #ff7a47;
 }
 
 .result-actions {
-  margin-top: 24px;
   display: flex;
-  gap: 12px;
+  gap: 16px;
+  justify-content: center;
   flex-wrap: wrap;
+  margin-top: 32px;
 }
 
-.instructions {
-  margin-top: 32px;
+.result-actions .btn {
+  min-width: 180px;
+}
+
+/* Transaction Status */
+.tx-status {
   padding: 24px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
+  border-radius: 16px;
+  margin: 24px 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.tx-pending {
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  color: #ffc107;
+}
+
+.tx-status .spinner {
+  width: 40px;
+  height: 40px;
+  border-top-color: #ffc107;
+  margin: 0;
+}
+
+.tx-status p {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* Instructions Section */
+.instructions {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 16px;
+  padding: 32px;
+  margin: 32px 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .instructions h3 {
-  color: #ffffff;
-  margin-bottom: 16px;
-  font-size: 1.1rem;
+  font-size: 1.5rem;
   font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 20px;
+  letter-spacing: -0.3px;
 }
 
 .instructions ol {
-  text-align: left;
-  margin: 16px 0;
-  padding-left: 24px;
-  color: #d0d0d0;
+  list-style-position: outside;
+  padding-left: 32px;
+  padding-right: 16px;
+  margin: 0 0 20px 0;
+  color: #e0e0e0;
+  line-height: 1.8;
 }
 
 .instructions li {
-  margin: 8px 0;
-  font-size: 0.9rem;
-  line-height: 1.6;
+  margin: 12px 0;
+  padding-left: 8px;
+  font-size: 1rem;
+  color: #e0e0e0;
 }
 
-.note {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  color: #888;
-  font-size: 0.85rem;
-  font-style: normal;
-}
-
-.app-footer {
+.instructions .note {
+  margin-top: 20px;
+  padding: 16px;
+  background: rgba(255, 107, 53, 0.1);
+  border: 1px solid rgba(255, 107, 53, 0.2);
+  border-radius: 12px;
+  color: #ffb84d;
+  font-size: 0.95rem;
   text-align: center;
-  color: #999;
-  padding: 20px;
-  opacity: 0.8;
+  font-weight: 500;
 }
 
 /* Navigation Tabs */
 .nav-tabs {
   display: flex;
-  gap: 4px;
-  margin-bottom: 24px;
-  border-bottom: 1px solid #2a2a2a;
+  gap: 8px;
+  margin-bottom: 32px;
+  border-bottom: 2px solid #2a2a2a;
   padding-bottom: 0;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -513,375 +527,652 @@ body {
 }
 
 .nav-tab {
-  padding: 12px 20px;
+  padding: 14px 24px;
   background: transparent;
   border: none;
-  border-bottom: 2px solid transparent;
-  color: #888;
-  font-size: 0.9rem;
+  color: #a0a0a0;
+  font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
-  letter-spacing: 0.2px;
-  margin-bottom: -1px;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
   white-space: nowrap;
+  position: relative;
+  margin-bottom: -2px;
 }
 
 .nav-tab:hover {
-  color: #d0d0d0;
+  color: #e0e0e0;
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .nav-tab.active {
   color: #ff6b35;
   border-bottom-color: #ff6b35;
+  font-weight: 600;
 }
 
-/* Responsive tabs */
-@media (max-width: 768px) {
-  .nav-tabs {
-    gap: 5px;
+/* QR Reader Styling */
+#qr-reader__dashboard {
+  background: transparent !important;
+  padding: 20px !important;
+}
+
+#qr-reader__dashboard_section_csr {
+  margin-bottom: 20px !important;
+}
+
+#qr-reader__camera_selection {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  padding: 12px 16px !important;
+  margin-bottom: 16px !important;
+  font-size: 0.95rem !important;
+  width: 100% !important;
+  color: #e0e0e0 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+}
+
+#qr-reader__camera_selection:hover {
+  border-color: #ff6b35 !important;
+  background: rgba(255, 107, 53, 0.1) !important;
+}
+
+#qr-reader__camera_selection:focus {
+  outline: none !important;
+  border-color: #ff6b35 !important;
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2) !important;
+}
+
+#qr-reader__scan_region {
+  background: #000000 !important;
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  position: relative !important;
+  min-height: 500px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#qr-reader__scan_region video {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  border-radius: 16px !important;
+  background: #000 !important;
+  object-fit: cover !important;
+}
+
+#qr-reader__scan_region canvas {
+  border-radius: 16px !important;
+}
+
+#qr-reader__dashboard_section_swaplink {
+  display: none !important;
+}
+
+#qr-reader button,
+#qr-reader__dashboard button {
+  background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 12px 24px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  font-size: 0.95rem !important;
+  min-height: 44px !important;
+}
+
+#qr-reader button:hover,
+#qr-reader__dashboard button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 16px rgba(255, 107, 53, 0.4) !important;
+}
+
+#qr-reader label,
+#qr-reader__dashboard label {
+  color: #e0e0e0 !important;
+  font-size: 0.95rem !important;
+}
+
+#qr-reader input[type="file"] {
+  display: none !important;
+}
+
+/* Responsive Design - Tablet */
+@media (max-width: 1024px) {
+  .app {
+    padding: 28px 20px;
   }
 
-  .nav-tab {
-    padding: 10px 15px;
-    font-size: 0.9rem;
+  .app-main {
+    padding: 40px 32px;
+  }
+
+  .scanner-container {
+    padding: 36px 28px;
   }
 }
 
-/* Responsive Design - Mobile First Approach */
-
-/* Tablet and below */
+/* Responsive Design - Mobile Large */
 @media (max-width: 768px) {
   .app {
-    padding: 10px;
+    padding: 20px 16px;
+  }
+
+  .app-logo {
+    height: 48px;
+    flex-shrink: 0;
+  }
+
+  .header-text {
+    min-width: 0;
+    flex: 1;
   }
 
   .app-header {
-    margin-bottom: 20px;
-    padding: 15px 0;
+    margin-bottom: 32px;
+    padding: 16px 0;
   }
 
   .app-header h1 {
     font-size: 2rem;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
+    line-height: 1.2;
   }
 
   .subtitle {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 
   .app-main {
-    padding: 20px 15px;
-    border-radius: 15px;
-    margin-bottom: 15px;
+    padding: 28px 20px;
+    border-radius: 20px;
+    margin-bottom: 24px;
   }
 
   .wallet-section,
-  .scan-section,
-  .scanner-section,
-  .loading-section,
-  .result-section {
-    margin: 20px 0;
+  .scan-section {
+    padding: 24px 16px;
+    margin: 24px 0;
   }
 
   .wallet-section p,
   .scan-section p {
     font-size: 1rem;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+  }
+
+  .scanner-section {
+    margin: 24px 0;
+  }
+
+  .scanner-container {
+    padding: 24px 20px;
+    border-radius: 20px;
+  }
+
+  .scanner-header {
+    margin-bottom: 24px;
+  }
+
+  .scanner-header h3 {
+    font-size: 1.375rem;
+    margin-bottom: 8px;
+  }
+
+  .scanner-header p {
+    font-size: 0.9rem;
+  }
+
+  .scanner-loading {
+    padding: 40px 16px;
+    margin-bottom: 20px;
+  }
+
+  .qr-reader-wrapper {
+    min-height: 450px;
+    max-width: 100%;
+    margin-bottom: 24px;
+    border-radius: 16px;
+  }
+
+  .qr-reader-wrapper #qr-reader {
+    min-height: 450px;
+  }
+
+  #qr-reader__scan_region {
+    min-height: 450px !important;
+    border-radius: 16px !important;
+  }
+
+  #qr-reader__scan_region video {
+    border-radius: 12px !important;
   }
 
   .btn {
-    padding: 14px 25px;
-    font-size: 0.95rem;
     width: 100%;
-    max-width: 300px;
+    max-width: 100%;
+    padding: 16px 24px;
+    font-size: 1rem;
+    min-height: 56px;
+  }
+
+  .btn-cancel-scan {
+    max-width: 100%;
   }
 
   .result-section {
-    padding: 20px 15px;
-    margin: 20px 0;
+    padding: 32px 24px;
+    margin: 24px 0;
+    border-radius: 16px;
   }
 
   .result-section h2 {
-    font-size: 1.4rem;
-    margin-bottom: 15px;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
   }
 
-  .product-info {
-    padding: 15px;
-    margin: 15px 0;
+  .product-info,
+  .tx-info {
+    padding: 20px;
+    margin: 20px 0;
   }
 
-  .product-info p {
+  .product-info p,
+  .tx-info p {
     font-size: 0.95rem;
-    margin: 8px 0;
+    margin: 10px 0;
+  }
+
+  .result-actions {
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .result-actions .btn {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .nav-tabs {
+    gap: 4px;
+    margin-bottom: 24px;
+    padding-bottom: 0;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+  }
+
+  .nav-tab {
+    padding: 14px 20px;
+    font-size: 0.9rem;
+    scroll-snap-align: start;
+    flex-shrink: 0;
   }
 
   .instructions {
-    margin-top: 30px;
-    padding: 20px 15px;
+    padding: 24px 20px;
+    margin: 24px 0;
   }
 
   .instructions h3 {
-    font-size: 1.1rem;
-    margin-bottom: 15px;
+    font-size: 1.375rem;
+    margin-bottom: 16px;
+  }
+
+  .instructions ol {
+    padding-left: 28px;
+    padding-right: 12px;
+    margin: 0 0 16px 0;
   }
 
   .instructions li {
+    margin: 10px 0;
+    padding-left: 12px;
     font-size: 0.95rem;
+  }
+
+  .instructions .note {
+    margin-top: 16px;
+    padding: 14px;
+    font-size: 0.9rem;
+  }
+
+  .loading-section {
+    padding: 40px 24px;
+  }
+
+  .spinner {
+    width: 44px;
+    height: 44px;
+  }
+
+  .tx-status {
+    padding: 20px;
+    margin: 20px 0;
+  }
+}
+
+/* Responsive Design - Mobile Small */
+@media (max-width: 480px) {
+  .app {
+    padding: 16px 12px;
+  }
+
+  .header-content {
+    gap: 12px;
+    align-items: center;
+  }
+
+  .app-logo {
+    height: 40px;
+    flex-shrink: 0;
+  }
+
+  .header-text {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .app-header {
+    margin-bottom: 24px;
+    padding: 12px 0;
+  }
+
+  .app-header h1 {
+    font-size: 1.75rem;
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+
+  .subtitle {
+    font-size: 0.875rem;
+  }
+
+  .app-main {
+    padding: 24px 16px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+  }
+
+  .wallet-section,
+  .scan-section {
+    padding: 20px 12px;
+    margin: 20px 0;
+  }
+
+  .wallet-section p,
+  .scan-section p {
+    font-size: 0.95rem;
+    margin-bottom: 16px;
+  }
+
+  .scanner-container {
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+
+  .scanner-header {
+    margin-bottom: 20px;
+  }
+
+  .scanner-header h3 {
+    font-size: 1.25rem;
+    margin-bottom: 6px;
+  }
+
+  .scanner-header p {
+    font-size: 0.875rem;
+  }
+
+  .scanner-loading {
+    padding: 32px 12px;
+    margin-bottom: 16px;
+  }
+
+  .scanner-loading p {
+    font-size: 0.9rem;
+    margin-top: 16px;
+  }
+
+  .qr-reader-wrapper {
+    min-height: 400px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    border-width: 1px;
+  }
+
+  .qr-reader-wrapper #qr-reader {
+    min-height: 400px;
+  }
+
+  #qr-reader__scan_region {
+    min-height: 400px !important;
+    border-radius: 12px !important;
+  }
+
+  #qr-reader__scan_region video {
+    border-radius: 10px !important;
+  }
+
+  .btn {
+    padding: 14px 20px;
+    font-size: 0.95rem;
+    min-height: 52px;
+    border-radius: 10px;
+  }
+
+  .result-section {
+    padding: 24px 16px;
+    margin: 20px 0;
+    border-radius: 12px;
+  }
+
+  .result-section h2 {
+    font-size: 1.375rem;
+    margin-bottom: 16px;
+  }
+
+  .product-info,
+  .tx-info {
+    padding: 16px;
+    margin: 16px 0;
+    border-radius: 10px;
+  }
+
+  .product-info p,
+  .tx-info p {
+    font-size: 0.9rem;
     margin: 8px 0;
   }
 
-  .note {
+  .result-actions {
+    margin-top: 20px;
+    gap: 10px;
+  }
+
+  .nav-tabs {
+    margin-bottom: 20px;
+  }
+
+  .nav-tab {
+    padding: 12px 16px;
+    font-size: 0.875rem;
+  }
+
+  .instructions {
+    padding: 20px 16px;
+    margin: 20px 0;
+    border-radius: 12px;
+  }
+
+  .instructions h3 {
+    font-size: 1.25rem;
+    margin-bottom: 14px;
+  }
+
+  .instructions ol {
+    padding-left: 24px;
+    padding-right: 16px;
+    margin: 0 0 14px 0;
+  }
+
+  .instructions li {
+    margin: 10px 0;
+    padding-left: 16px;
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+
+  .instructions .note {
+    margin-top: 14px;
+    padding: 12px;
     font-size: 0.85rem;
-    margin-top: 12px;
-    padding-top: 12px;
   }
 
-  #qr-reader {
-    max-width: 100%;
-    padding: 15px;
-    width: 100%;
-    min-height: 280px;
-  }
-
-  /* Ensure QR scanner container is properly sized on mobile */
-  #qr-reader video,
-  #qr-reader canvas {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-  }
-
-  /* Adjust scanning box overlay for tablet */
-  #qr-reader__scan_region::before {
-    width: min(220px, calc(100% - 30px));
-    height: min(220px, calc(100% - 30px));
-    border-width: 2px;
-  }
-
-  #qr-reader__scan_region::after {
-    width: min(220px, calc(100% - 30px));
-    height: min(220px, calc(100% - 30px));
-  }
-
-  /* Hide file upload section completely on tablet */
-  #qr-reader__dashboard_section_csr {
-    display: none !important;
+  .loading-section {
+    padding: 32px 16px;
   }
 
   .spinner {
     width: 40px;
     height: 40px;
-    margin: 0 auto 15px;
+    margin-bottom: 16px;
   }
 
-  .loading-section p {
-    font-size: 0.95rem;
+  .tx-status {
+    padding: 16px;
+    margin: 16px 0;
+    border-radius: 12px;
+  }
+
+  .tx-status p {
+    font-size: 0.9rem;
   }
 }
 
-/* Mobile phones */
-@media (max-width: 480px) {
-  .app {
-    padding: 5px;
-  }
-
+/* Mobile Landscape Optimization */
+@media (max-width: 896px) and (orientation: landscape) {
   .app-header {
-    margin-bottom: 15px;
-    padding: 10px 0;
+    margin-bottom: 24px;
+    padding: 12px 0;
   }
 
   .app-header h1 {
     font-size: 1.75rem;
-    line-height: 1.2;
-  }
-
-  .subtitle {
-    font-size: 0.9rem;
-    padding: 0 10px;
   }
 
   .app-main {
-    padding: 15px 10px;
-    border-radius: 12px;
+    padding: 24px 20px;
   }
 
-  .wallet-section,
-  .scan-section,
-  .scanner-section,
-  .loading-section,
-  .result-section {
-    margin: 15px 0;
+  .qr-reader-wrapper {
+    min-height: 350px;
   }
 
-  .wallet-section p,
-  .scan-section p {
-    font-size: 0.95rem;
-    margin-bottom: 12px;
-    padding: 0 5px;
+  .qr-reader-wrapper #qr-reader {
+    min-height: 350px;
   }
 
+  #qr-reader__scan_region {
+    min-height: 350px !important;
+  }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
   .btn {
-    padding: 12px 20px;
-    font-size: 0.9rem;
-    width: 100%;
-    max-width: 100%;
-    min-height: 48px; /* Touch-friendly size */
+    min-height: 56px;
+    padding: 16px 24px;
+    -webkit-tap-highlight-color: rgba(255, 107, 53, 0.3);
   }
 
-  .result-section {
-    padding: 15px 10px;
-    margin: 15px 0;
+  .nav-tab {
+    min-height: 48px;
+    padding: 14px 20px;
+    -webkit-tap-highlight-color: rgba(255, 107, 53, 0.2);
   }
 
-  .result-section h2 {
-    font-size: 1.2rem;
-    margin-bottom: 12px;
-    line-height: 1.3;
+  .btn:hover {
+    transform: none;
   }
 
-  .product-info {
-    padding: 12px;
-    margin: 12px 0;
+  .btn:active {
+    transform: scale(0.97);
+    opacity: 0.85;
   }
 
-  .product-info p {
-    font-size: 0.9rem;
-    margin: 6px 0;
+  .btn-primary:active {
+    background: linear-gradient(135deg, #ff5a20 0%, #ff7a35 100%);
   }
 
-  .instructions {
-    margin-top: 20px;
-    padding: 15px 10px;
+  .stat-card:hover {
+    transform: none;
   }
 
-  .instructions h3 {
-    font-size: 1rem;
-    margin-bottom: 12px;
-  }
-
-  .instructions ol {
-    margin-left: 15px;
-    margin-bottom: 15px;
-  }
-
-  .instructions li {
-    font-size: 0.9rem;
-    margin: 6px 0;
-    line-height: 1.5;
-  }
-
-  .note {
-    font-size: 0.8rem;
-    margin-top: 10px;
-    padding-top: 10px;
-  }
-
-  #qr-reader {
-    padding: 10px;
-    margin: 15px 0;
-    width: 100%;
-    min-height: 250px;
-  }
-
-  /* Ensure QR scanner container is properly sized on small mobile */
-  #qr-reader video,
-  #qr-reader canvas {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-  }
-
-  /* Adjust scanning box overlay for mobile */
-  #qr-reader__scan_region::before {
-    width: min(200px, calc(100% - 20px));
-    height: min(200px, calc(100% - 20px));
-    border-width: 2px;
-  }
-
-  #qr-reader__scan_region::after {
-    width: min(200px, calc(100% - 20px));
-    height: min(200px, calc(100% - 20px));
-  }
-
-  /* Ensure camera selection is mobile-friendly */
-  #qr-reader__camera_selection {
-    font-size: 0.85rem !important;
-    padding: 8px 12px !important;
-  }
-
-  /* Hide file upload section completely on mobile */
-  #qr-reader__dashboard_section_csr {
-    display: none !important;
-  }
-
-  .spinner {
-    width: 35px;
-    height: 35px;
-    margin: 0 auto 12px;
-  }
-
-  .loading-section {
-    padding: 30px 15px;
-  }
-
-  .loading-section p {
-    font-size: 0.9rem;
-  }
-
-  .app-footer {
-    padding: 15px 10px;
-    font-size: 0.85rem;
-  }
-
-  /* Better spacing for error messages */
-  .result-error p {
-    font-size: 0.9rem;
-    line-height: 1.4;
+  .stat-card:active {
+    transform: scale(0.98);
   }
 }
 
-/* Very small screens */
-@media (max-width: 360px) {
-  .app-header h1 {
-    font-size: 1.5rem;
+/* Safe Area Support for Notched Devices */
+@supports (padding: max(0px)) {
+  .app {
+    padding-left: max(24px, env(safe-area-inset-left));
+    padding-right: max(24px, env(safe-area-inset-right));
+    padding-top: max(32px, env(safe-area-inset-top));
+    padding-bottom: max(32px, env(safe-area-inset-bottom));
   }
 
-  .subtitle {
-    font-size: 0.85rem;
+  @media (max-width: 768px) {
+    .app {
+      padding-left: max(16px, env(safe-area-inset-left));
+      padding-right: max(16px, env(safe-area-inset-right));
+      padding-top: max(20px, env(safe-area-inset-top));
+      padding-bottom: max(20px, env(safe-area-inset-bottom));
+    }
   }
 
+  @media (max-width: 480px) {
+    .app {
+      padding-left: max(12px, env(safe-area-inset-left));
+      padding-right: max(12px, env(safe-area-inset-right));
+      padding-top: max(16px, env(safe-area-inset-top));
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
+    }
+  }
+}
+
+/* Prevent text size adjustment on iOS */
+@media screen and (max-width: 768px) {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  input,
+  textarea,
+  select {
+    font-size: 16px !important; /* Prevents zoom on focus in iOS */
+  }
+}
+
+/* Improve scrolling on mobile */
+@media (max-width: 768px) {
   .app-main {
-    padding: 12px 8px;
+    -webkit-overflow-scrolling: touch;
+    overflow-x: hidden;
   }
 
-  .btn {
-    font-size: 0.85rem;
-    padding: 10px 15px;
-  }
-
-  .result-section h2 {
-    font-size: 1.1rem;
+  .nav-tabs {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
-/* Landscape orientation on mobile */
-@media (max-width: 768px) and (orientation: landscape) {
-  .app-header {
-    margin-bottom: 15px;
-    padding: 10px 0;
-  }
-
-  .app-header h1 {
-    font-size: 1.5rem;
-  }
-
-  .app-main {
-    padding: 15px;
-  }
-
-  #qr-reader {
-    max-width: 400px;
-  }
-}

@@ -232,12 +232,11 @@ function App() {
         );
 
         setScanner(qrScanner);
-        setLoading(true); // Show loading while camera starts
+        setLoading(true);
 
         console.log("QR scanner instance created, calling render()...");
 
         // Start scanning with proper error handling
-        // The render method should start the camera automatically
         qrScanner.render(
           async (decodedText) => {
             console.log("QR Code detected:", decodedText);
@@ -256,7 +255,6 @@ function App() {
           },
           (errorMessage: any) => {
             console.log("QR scanner error callback triggered:", errorMessage);
-            setLoading(false);
             
             // Handle both string and object error messages
             const errorStr = typeof errorMessage === "string" 
@@ -265,17 +263,24 @@ function App() {
                 ? String(errorMessage.message)
                 : String(errorMessage);
             
-            console.log("Processed error string:", errorStr);
-            
             // Check for camera-specific errors
             if (errorStr && (
               errorStr.includes("Permission") || 
               errorStr.includes("NotAllowedError") ||
               errorStr.includes("NotReadableError") ||
               errorStr.includes("NotFoundError") ||
-              errorStr.includes("Could not start video stream")
+              errorStr.includes("Could not start video stream") ||
+              errorStr.includes("camera") ||
+              errorStr.includes("Camera")
             )) {
+              setLoading(false);
               setScanning(false);
+              try {
+                qrScanner.clear();
+              } catch (e) {
+                console.log("Error clearing scanner:", e);
+              }
+              setScanner(null);
               setResult({
                 status: "error",
                 message: errorStr.includes("Permission") || errorStr.includes("NotAllowedError")
@@ -287,7 +292,7 @@ function App() {
               return;
             }
 
-            // Only log non-common scanning errors
+            // Only log non-common scanning errors (not "No QR code found" messages)
             if (errorStr && 
                 !errorStr.includes("NotFoundException") && 
                 !errorStr.includes("No QR code") &&
@@ -303,28 +308,40 @@ function App() {
         console.log("QR scanner render() called, waiting for camera to start...");
 
         // Check if camera started by looking for video element
+        let checkCount = 0;
+        const maxChecks = 10;
         const checkCameraStarted = () => {
+          checkCount++;
           const videoElement = element.querySelector("video");
           if (videoElement) {
             console.log("Camera video element found!");
-            setLoading(false);
-            // Check if video is actually playing
+            // Wait for video to be ready
+            const onVideoReady = () => {
+              setLoading(false);
+              console.log("Video is ready and playing");
+            };
+            
             if (videoElement.readyState >= 2) {
-              console.log("Video is ready and should be playing");
+              onVideoReady();
+            } else {
+              videoElement.addEventListener("loadeddata", onVideoReady, { once: true });
+              videoElement.addEventListener("playing", onVideoReady, { once: true });
             }
+          } else if (checkCount < maxChecks) {
+            setTimeout(checkCameraStarted, 500);
           } else {
-            console.log("Video element not found yet, will check again...");
-            setTimeout(checkCameraStarted, 1000);
+            console.log("Camera not found after multiple attempts");
+            setLoading(false);
           }
         };
 
         // Start checking after a short delay
-        setTimeout(checkCameraStarted, 2000);
+        setTimeout(checkCameraStarted, 500);
         
-        // Also set a fallback to hide loading
+        // Fallback to hide loading after reasonable time
         setTimeout(() => {
           setLoading(false);
-        }, 5000);
+        }, 3000);
       } catch (error: any) {
         console.error("Error initializing QR scanner:", error);
         setLoading(false);
@@ -520,8 +537,16 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>ChainCheck</h1>
-        <p className="subtitle">Verify Product Authenticity</p>
+        <div className="header-content">
+          <img src="/logo.png" alt="ChainCheck Logo" className="app-logo" />
+          <div className="header-text">
+            <h1>
+              <span className="title-chain">Chain</span>
+              <span className="title-check">Check</span>
+            </h1>
+            <p className="subtitle">Verify Product Authenticity</p>
+          </div>
+        </div>
       </header>
 
       <main className="app-main">
@@ -636,16 +661,22 @@ function App() {
             {/* QR Code Scanner */}
             {scanning && (
               <div className="scanner-section">
-                {loading && (
-                  <div className="loading-section" style={{ marginBottom: "20px" }}>
-                    <div className="spinner"></div>
-                    <p>Starting camera...</p>
+                <div className="scanner-container">
+                  <div className="scanner-header">
+                    <h3>Scan QR Code</h3>
+                    <p>Position the QR code within the frame</p>
                   </div>
-                )}
-                <div id="qr-reader" ref={qrReaderRef}></div>
-                <button onClick={stopScan} className="btn btn-secondary">
-                  Cancel Scan
-                </button>
+                  {loading && (
+                    <div className="scanner-loading">
+                      <div className="spinner"></div>
+                      <p>Initializing camera...</p>
+                    </div>
+                  )}
+                  <div id="qr-reader" ref={qrReaderRef} className="qr-reader-wrapper"></div>
+                  <button onClick={stopScan} className="btn btn-secondary btn-cancel-scan">
+                    Cancel Scan
+                  </button>
+                </div>
               </div>
             )}
 

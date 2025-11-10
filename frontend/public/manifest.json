@@ -1,0 +1,24 @@
+{
+  "name": "ChainCheck - Product Authenticity Verification",
+  "short_name": "ChainCheck",
+  "description": "Verify product authenticity instantly with blockchain technology using QR codes and Polygon blockchain",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a1a",
+  "theme_color": "#1a1a1a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity", "utilities"],
+  "lang": "en-US",
+  "dir": "ltr",
+  "scope": "/",
+  "prefer_related_applications": false
+}
+
