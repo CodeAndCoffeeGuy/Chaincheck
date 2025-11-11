@@ -8,6 +8,8 @@ import {
   connectWallet,
 } from "./utils/blockchain";
 import { validateQRCodeOffline } from "./utils/qrValidator";
+import { copyToClipboardWithFeedback } from "./utils/clipboard";
+import { useToast } from "./contexts/ToastContext";
 import { CURRENT_NETWORK } from "./config";
 import ManufacturerDashboard from "./components/ManufacturerDashboard";
 import VerificationHistory from "./components/VerificationHistory";
@@ -29,6 +31,8 @@ import "./App.css";
  * - Error handling and user feedback
  */
 function App() {
+  const { showToast } = useToast();
+  
   // Application state
   const [scanning, setScanning] = useState(false);
   const [result, setResult] = useState<{
@@ -130,6 +134,7 @@ function App() {
         setWalletConnected(true);
         console.log("Wallet connected:", accounts[0]);
         setResult(null); // Clear any previous errors
+        showToast("Wallet connected successfully!", "success");
       } else {
         throw new Error("No accounts found. Please unlock MetaMask and try again.");
       }
@@ -451,6 +456,7 @@ function App() {
           txHash: verificationResult.txHash,
           blockNumber: verificationResult.blockNumber,
         });
+        showToast("Product verified as authentic!", "success");
       } else {
         setResult({
           status: "fake",
@@ -460,6 +466,7 @@ function App() {
           txHash: verificationResult.txHash,
           blockNumber: verificationResult.blockNumber,
         });
+        showToast("Warning: Product may be counterfeit", "warning");
       }
     } catch (error: any) {
       console.error("Verification error:", error);
@@ -491,6 +498,7 @@ function App() {
         status: "error",
         message: errorMessage,
       });
+      showToast(errorMessage, "error");
     } finally {
       setLoading(false);
       // Reset tx status after a delay
@@ -723,6 +731,17 @@ function App() {
                       >
                         {result.txHash.substring(0, 10)}...{result.txHash.substring(result.txHash.length - 8)}
                       </a>
+                      <button
+                        onClick={() => copyToClipboardWithFeedback(result.txHash!, showToast)}
+                        className="btn-copy"
+                        title="Copy transaction hash"
+                        aria-label="Copy transaction hash"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                        </svg>
+                      </button>
                     </p>
                     {result.blockNumber && (
                       <p>
@@ -737,16 +756,23 @@ function App() {
                   </button>
                   {result.status !== "error" && (
                     <button
-                      onClick={() => {
+                      onClick={async () => {
                         const shareText = `ChainCheck Verification Result:\n${result.message}\nProduct: ${result.productName}\nBrand: ${result.productBrand}\n${result.txHash ? `Transaction: ${result.txHash}` : ""}`;
                         if (navigator.share) {
-                          navigator.share({
-                            title: "ChainCheck Verification",
-                            text: shareText,
-                          });
+                          try {
+                            await navigator.share({
+                              title: "ChainCheck Verification",
+                              text: shareText,
+                            });
+                            showToast("Result shared successfully!", "success");
+                          } catch (err) {
+                            // User cancelled or error occurred
+                            if ((err as Error).name !== "AbortError") {
+                              await copyToClipboardWithFeedback(shareText, showToast);
+                            }
+                          }
                         } else {
-                          navigator.clipboard.writeText(shareText);
-                          alert("Verification result copied to clipboard!");
+                          await copyToClipboardWithFeedback(shareText, showToast);
                         }
                       }}
                       className="btn btn-secondary"
