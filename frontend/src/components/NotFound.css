@@ -17,6 +17,9 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   position: relative;
   overflow: hidden;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  max-width: 100%;
 }
 
 .not-found-content::before {
@@ -109,6 +112,9 @@
   transition: all 0.3s ease;
   display: inline-block;
   font-weight: 500;
+  word-break: break-all;
+  overflow-wrap: break-word;
+  max-width: 100%;
 }
 
 .not-found-links a:hover {
@@ -146,21 +152,65 @@
 }
 
 @media (max-width: 480px) {
+  .not-found-page {
+    padding: 16px 12px;
+  }
+
   .not-found-content {
-    padding: 32px 24px;
+    padding: 40px 20px;
   }
 
   .not-found-content h1 {
-    font-size: 3rem;
+    font-size: 3.5rem;
+    margin-bottom: 16px;
   }
 
   .not-found-content h2 {
     font-size: 1.5rem;
+    margin-bottom: 16px;
+  }
+
+  .not-found-message {
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+
+  .not-found-icon {
+    margin-bottom: 32px;
   }
 
   .not-found-icon svg {
     width: 80px;
     height: 80px;
+  }
+
+  .not-found-actions {
+    margin-bottom: 32px;
+  }
+
+  .not-found-actions .btn {
+    min-height: 48px;
+    font-size: 1rem;
+    padding: 14px 24px;
+  }
+
+  .not-found-links {
+    padding-top: 24px;
+  }
+
+  .not-found-links p {
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+  }
+
+  .not-found-links a {
+    font-size: 0.95rem;
+    padding: 12px 20px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 

@@ -328,24 +328,64 @@
 
 @media (max-width: 480px) {
   .manufacturer-dashboard {
-    padding: 16px 12px;
+    padding: 20px 16px;
   }
 
   .manufacturer-dashboard h2 {
     font-size: 1.5rem;
+    margin-bottom: 24px;
+  }
+
+  .manufacturer-dashboard h3 {
+    font-size: 1.25rem;
+    margin-bottom: 16px;
   }
 
   .stats-section,
   .registration-section {
-    padding: 20px 16px;
+    padding: 24px 16px;
+    margin-bottom: 24px;
   }
 
   .stat-value {
     font-size: 1.75rem;
   }
 
+  .stat-label {
+    font-size: 1rem;
+  }
+
   .form-group {
-    margin-bottom: 18px;
+    margin-bottom: 20px;
+  }
+
+  .form-group label {
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 14px 16px;
+    min-height: 48px;
+  }
+
+  .form-group small {
+    font-size: 0.85rem;
+    margin-top: 6px;
+  }
+
+  .dashboard-actions .btn {
+    min-height: 48px;
+    font-size: 1rem;
+    padding: 14px 24px;
+  }
+
+  .section-btn {
+    min-height: 44px;
+    font-size: 0.95rem;
+    padding: 12px 20px;
   }
 }
 

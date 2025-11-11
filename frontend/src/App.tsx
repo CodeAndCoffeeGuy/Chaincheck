@@ -717,7 +717,7 @@ function App() {
         )}
 
         {/* Verification Section */}
-        {(!walletConnected || activeTab === "verify") && (
+        {activeTab === "verify" && (
           <>
             {/* Beta Banner */}
             <div className="beta-banner">

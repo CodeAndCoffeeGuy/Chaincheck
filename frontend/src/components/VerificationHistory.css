@@ -458,13 +458,31 @@
 
   .history-list th,
   .history-list td {
-    padding: 10px 8px;
-    font-size: 0.8rem;
+    padding: 12px 10px;
+    font-size: 0.9rem;
+  }
+
+  .address-cell {
+    font-size: 0.85rem;
   }
 
   .status-badge {
-    padding: 4px 10px;
-    font-size: 0.8rem;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    min-height: 28px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .history-actions .btn {
+    min-height: 44px;
+    font-size: 0.95rem;
+    padding: 12px 20px;
+  }
+
+  .history-search-input {
+    font-size: 16px; /* Prevents zoom on iOS */
+    min-height: 48px;
   }
 }
 

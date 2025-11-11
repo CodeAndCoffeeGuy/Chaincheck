@@ -3,6 +3,7 @@
   max-width: 900px;
   margin: 0 auto;
   padding: 32px;
+  overflow-x: hidden;
 }
 
 .legal-content {
@@ -12,6 +13,9 @@
   border: 1px solid #2a2a2a;
   line-height: 1.8;
   color: #e0e0e0;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  max-width: 100%;
 }
 
 .legal-content h1 {
@@ -107,6 +111,8 @@
   margin: 12px 0;
   color: #e0e0e0;
   line-height: 1.7;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .legal-content a {
@@ -115,6 +121,9 @@
   transition: all 0.2s ease;
   font-weight: 500;
   border-bottom: 1px solid transparent;
+  word-break: break-all;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .legal-content a:hover {
@@ -146,15 +155,66 @@
 
 @media (max-width: 480px) {
   .legal-page {
-    padding: 16px;
+    padding: 16px 12px;
   }
 
   .legal-content {
     padding: 24px 16px;
+    line-height: 1.8;
   }
 
   .legal-content h1 {
     font-size: 1.75rem;
+    margin-bottom: 24px;
+  }
+
+  .legal-content h2 {
+    font-size: 1.375rem;
+    margin-bottom: 16px;
+  }
+
+  .legal-content h3 {
+    font-size: 1.125rem;
+    margin-top: 20px;
+    margin-bottom: 12px;
+  }
+
+  .legal-content p {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    margin-bottom: 14px;
+  }
+
+  .legal-content ul,
+  .legal-content ol {
+    margin: 14px 0;
+    padding-left: 20px;
+  }
+
+  .legal-content li {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    margin: 10px 0;
+  }
+
+  .legal-content section {
+    padding: 20px 16px;
+    margin-bottom: 32px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  }
+
+  .legal-content a {
+    word-break: break-all;
+    overflow-wrap: anywhere;
+    display: inline-block;
+    max-width: 100%;
+  }
+
+  .legal-content .last-updated {
+    font-size: 0.875rem;
+    padding: 16px;
+    margin-bottom: 32px;
   }
 }
 

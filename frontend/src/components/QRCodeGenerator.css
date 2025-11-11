@@ -288,16 +288,61 @@
 
 @media (max-width: 480px) {
   .qr-generator {
-    padding: 20px 16px;
+    padding: 24px 16px;
   }
 
-  .qr-generator h2 {
+  .qr-generator h3 {
     font-size: 1.5rem;
+    margin-bottom: 20px;
+  }
+
+  .form-group label {
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+  }
+
+  .form-group input[type="text"],
+  .form-group input[type="number"],
+  .form-group select,
+  .form-group textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 14px 16px;
+    min-height: 48px;
+  }
+
+  .form-group small {
+    font-size: 0.85rem;
+  }
+
+  .generator-actions .btn {
+    min-height: 48px;
+    font-size: 1rem;
+    padding: 14px 24px;
   }
 
   .batch-qr-grid {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+  }
+
+  .batch-qr-item {
+    padding: 16px;
+  }
+
+  .batch-qr-serial {
+    font-size: 0.9rem;
+  }
+
+  .batch-qr-actions .btn-small {
+    min-height: 36px;
+    font-size: 0.85rem;
+    padding: 8px 12px;
+  }
+
+  .download-actions .btn-small {
+    min-height: 44px;
+    font-size: 0.95rem;
+    padding: 12px 20px;
   }
 }
 
