@@ -11,6 +11,7 @@ import { validateQRCodeOffline } from "./utils/qrValidator";
 import { copyToClipboardWithFeedback } from "./utils/clipboard";
 import { useToast } from "./contexts/ToastContext";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
+import { addCachedVerification, getCachedVerification } from "./utils/transactionCache";
 import { CURRENT_NETWORK } from "./config";
 import ManufacturerDashboard from "./components/ManufacturerDashboard";
 import VerificationHistory from "./components/VerificationHistory";
@@ -438,6 +439,24 @@ function App() {
       // Generate serial hash
       const serialHash = generateSerialHash(batchId, serialNumber);
 
+      // Check cache first
+      const cached = getCachedVerification(serialHash);
+      if (cached && cached.txHash) {
+        // Use cached result if available
+        setResult({
+          status: cached.isAuthentic ? "authentic" : "fake",
+          message: cached.isAuthentic ? "Product verified as AUTHENTIC" : "WARNING: This product may be COUNTERFEIT",
+          productName: cached.productName,
+          productBrand: cached.productBrand,
+          txHash: cached.txHash,
+          blockNumber: cached.blockNumber,
+        });
+        setTxStatus("success");
+        showToast(cached.isAuthentic ? "Product verified (from cache)" : "Warning: Product may be counterfeit (from cache)", cached.isAuthentic ? "success" : "warning");
+        setLoading(false);
+        return;
+      }
+
       // Set transaction status to pending
       setTxStatus("pending");
 
@@ -446,6 +465,22 @@ function App() {
 
       // Set transaction status to success
       setTxStatus("success");
+
+      // Cache the verification result
+      if (verificationResult.txHash) {
+        addCachedVerification({
+          serialHash,
+          batchId,
+          serialNumber,
+          isAuthentic: verificationResult.isAuthentic,
+          verifier: await getCurrentAccount() || "",
+          timestamp: Math.floor(Date.now() / 1000),
+          txHash: verificationResult.txHash,
+          blockNumber: verificationResult.blockNumber,
+          productName: verificationResult.productName,
+          productBrand: verificationResult.productBrand,
+        });
+      }
 
       // Set result based on verification
       if (verificationResult.isAuthentic) {

@@ -6,6 +6,7 @@ import {
   connectWallet,
   getCurrentAccount,
 } from "../utils/blockchain";
+import QRCodeGenerator from "./QRCodeGenerator";
 import "./ManufacturerDashboard.css";
 
 /**
@@ -33,6 +34,7 @@ function ManufacturerDashboard() {
   const [productName, setProductName] = useState("");
   const [productBrand, setProductBrand] = useState("");
   const [serialNumbers, setSerialNumbers] = useState("");
+  const [activeSection, setActiveSection] = useState<"register" | "generator">("register");
 
   /**
    * Check authorization on mount
@@ -144,14 +146,6 @@ function ManufacturerDashboard() {
     }
   };
 
-  /**
-   * Generate QR code URL for a serial number
-   */
-  const generateQRUrl = (batchId: string, serialNumber: string) => {
-    const baseUrl = window.location.origin;
-    return `${baseUrl}/qr?batchId=${batchId}&serialNumber=${serialNumber}`;
-  };
-
   if (authorized === null) {
     return (
       <div className="dashboard-section">
@@ -196,7 +190,24 @@ function ManufacturerDashboard() {
         </div>
       )}
 
+      {/* Section Toggle */}
+      <div className="dashboard-section-toggle">
+        <button
+          className={`section-btn ${activeSection === "register" ? "active" : ""}`}
+          onClick={() => setActiveSection("register")}
+        >
+          Register Products
+        </button>
+        <button
+          className={`section-btn ${activeSection === "generator" ? "active" : ""}`}
+          onClick={() => setActiveSection("generator")}
+        >
+          QR Code Generator
+        </button>
+      </div>
+
       {/* Registration Form */}
+      {activeSection === "register" && (
       <div className="registration-section">
         <h3>Register New Product Batch</h3>
         <form onSubmit={handleRegisterProduct}>
@@ -267,17 +278,12 @@ function ManufacturerDashboard() {
           </button>
         </form>
       </div>
+      )}
 
-      {/* QR Code Generator Helper */}
-      {batchId && serialNumbers && (
-        <div className="qr-helper-section">
-          <h3>QR Code Generator</h3>
-          <p>After registering, generate QR codes using:</p>
-          <div className="qr-url-example">
-            <code>
-              {generateQRUrl(batchId, serialNumbers.split(/[,\n]/)[0].trim())}
-            </code>
-          </div>
+      {/* QR Code Generator Section */}
+      {activeSection === "generator" && (
+        <div className="qr-generator-section">
+          <QRCodeGenerator />
         </div>
       )}
     </div>

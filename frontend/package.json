@@ -9,8 +9,10 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
+    "@types/qrcode": "^1.5.6",
     "ethers": "^6.13.0",
     "html5-qrcode": "^2.3.8",
+    "qrcode": "^1.5.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -27,4 +29,3 @@
     "vite": "^5.2.0"
   }
 }
-

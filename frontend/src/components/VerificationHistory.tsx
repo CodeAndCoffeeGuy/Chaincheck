@@ -7,6 +7,7 @@ import {
   getRecentSearches,
   clearRecentSearches,
 } from "../utils/localStorage";
+import { debounce } from "../utils/debounce";
 import SkeletonLoader from "./SkeletonLoader";
 import "./VerificationHistory.css";
 
@@ -19,11 +20,13 @@ function VerificationHistory() {
   const [batchId, setBatchId] = useState("");
   const [serialNumber, setSerialNumber] = useState("");
   const [history, setHistory] = useState<any[]>([]);
+  const [filteredHistory, setFilteredHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [count, setCount] = useState<number | null>(null);
   const [recentSearches, setRecentSearches] = useState<Array<{ batchId: string; serialNumber: string; timestamp: number }>>([]);
   const [showRecentSearches, setShowRecentSearches] = useState(false);
+  const [searchFilter, setSearchFilter] = useState("");
   const batchIdInputRef = useRef<HTMLInputElement>(null);
   const serialNumberInputRef = useRef<HTMLInputElement>(null);
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -82,6 +85,31 @@ function VerificationHistory() {
     };
   }, [showRecentSearches]);
 
+  // Debounced search filter
+  const debouncedFilter = useRef(
+    debounce((filterValue: string) => {
+      if (!filterValue.trim()) {
+        setFilteredHistory(history);
+        return;
+      }
+
+      const lowerFilter = filterValue.toLowerCase();
+      const filtered = history.filter((record) => {
+        return (
+          record.date.toLowerCase().includes(lowerFilter) ||
+          record.batchId.toString().includes(lowerFilter) ||
+          record.verifier.toLowerCase().includes(lowerFilter) ||
+          (record.isAuthentic ? "authentic" : "counterfeit").includes(lowerFilter)
+        );
+      });
+      setFilteredHistory(filtered);
+    }, 300)
+  ).current;
+
+  useEffect(() => {
+    debouncedFilter(searchFilter);
+  }, [searchFilter, history, debouncedFilter]);
+
   /**
    * Load verification history
    */
@@ -118,6 +146,7 @@ function VerificationHistory() {
       }));
 
       setHistory(formattedHistory);
+      setFilteredHistory(formattedHistory);
       
       // Add to recent searches
       addRecentSearch(batchId, serialNumber);
@@ -293,46 +322,77 @@ function VerificationHistory() {
       {history.length > 0 && (
         <>
           <div className="history-actions">
-            <button onClick={() => exportHistory("csv")} className="btn btn-secondary">
-              Export as CSV
-            </button>
-            <button onClick={() => exportHistory("json")} className="btn btn-secondary">
-              Export as JSON
-            </button>
+            <div className="history-search">
+              <input
+                type="text"
+                placeholder="Search history..."
+                value={searchFilter}
+                onChange={(e) => setSearchFilter(e.target.value)}
+                className="history-search-input"
+              />
+              {searchFilter && (
+                <button
+                  onClick={() => setSearchFilter("")}
+                  className="clear-search-btn"
+                  title="Clear search"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+            <div className="history-export-buttons">
+              <button onClick={() => exportHistory("csv")} className="btn btn-secondary">
+                Export as CSV
+              </button>
+              <button onClick={() => exportHistory("json")} className="btn btn-secondary">
+                Export as JSON
+              </button>
+            </div>
           </div>
-          <div className="history-list">
-            <table>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Batch ID</th>
-                  <th>Verifier</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {history.map((record, index) => (
-                  <tr key={index}>
-                    <td>{record.date}</td>
-                    <td>{record.batchId}</td>
-                    <td className="address-cell">
-                      {record.verifier.substring(0, 6)}...
-                      {record.verifier.substring(record.verifier.length - 4)}
-                    </td>
-                    <td>
-                      <span
-                        className={`status-badge ${
-                          record.isAuthentic ? "status-authentic" : "status-fake"
-                        }`}
-                      >
-                        {record.isAuthentic ? "Authentic" : "Counterfeit"}
-                      </span>
-                    </td>
+          {filteredHistory.length === 0 && searchFilter ? (
+            <div className="no-results">
+              <p>No results found for "{searchFilter}"</p>
+            </div>
+          ) : (
+            <div className="history-list">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Batch ID</th>
+                    <th>Verifier</th>
+                    <th>Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {filteredHistory.map((record, index) => (
+                    <tr key={index}>
+                      <td>{record.date}</td>
+                      <td>{record.batchId}</td>
+                      <td className="address-cell">
+                        {record.verifier.substring(0, 6)}...
+                        {record.verifier.substring(record.verifier.length - 4)}
+                      </td>
+                      <td>
+                        <span
+                          className={`status-badge ${
+                            record.isAuthentic ? "status-authentic" : "status-fake"
+                          }`}
+                        >
+                          {record.isAuthentic ? "Authentic" : "Counterfeit"}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          {searchFilter && filteredHistory.length > 0 && (
+            <div className="search-results-info">
+              <p>Showing {filteredHistory.length} of {history.length} results</p>
+            </div>
+          )}
         </>
       )}
 
