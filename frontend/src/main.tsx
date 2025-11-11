@@ -1,4 +1,4 @@
-import React from "react";
+import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -12,13 +12,13 @@ import "./index.css";
  * Renders the ChainCheck application to the DOM
  */
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
+  <StrictMode>
     <ErrorBoundary>
       <ToastProvider>
         <App />
       </ToastProvider>
     </ErrorBoundary>
-  </React.StrictMode>
+  </StrictMode>
 );
 
 // Register Service Worker for PWA

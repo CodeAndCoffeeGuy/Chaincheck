@@ -629,7 +629,13 @@ function App() {
     },
   ], [walletConnected, scanning, showToast, stopScan, setActiveTab]);
   
-  useKeyboardShortcuts(shortcuts);
+  // Only enable keyboard shortcuts if we have valid shortcuts
+  // Disable in development to avoid React initialization timing issues
+  const shouldEnableShortcuts = import.meta.env.PROD;
+  useKeyboardShortcuts(
+    shortcuts && Array.isArray(shortcuts) ? shortcuts : [], 
+    shouldEnableShortcuts
+  );
 
   return (
     <div className="app">

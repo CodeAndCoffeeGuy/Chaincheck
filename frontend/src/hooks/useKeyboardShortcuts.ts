@@ -16,16 +16,22 @@ interface KeyboardShortcut {
  * @param enabled Whether shortcuts are enabled (default: true)
  */
 export const useKeyboardShortcuts = (
-  shortcuts: KeyboardShortcut[],
+  shortcuts: KeyboardShortcut[] = [],
   enabled: boolean = true
 ) => {
   // Use ref to store latest shortcuts without causing effect to re-run
-  const shortcutsRef = useRef<KeyboardShortcut[]>(shortcuts);
+  const shortcutsRef = useRef<KeyboardShortcut[]>(shortcuts || []);
   const enabledRef = useRef<boolean>(enabled);
+  const mountedRef = useRef<boolean>(false);
   
-  // Update refs when values change
+  // Update refs when values change - with safety check
   useEffect(() => {
-    shortcutsRef.current = shortcuts;
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+    }
+    if (shortcuts && Array.isArray(shortcuts)) {
+      shortcutsRef.current = shortcuts;
+    }
   }, [shortcuts]);
   
   useEffect(() => {
@@ -33,7 +39,8 @@ export const useKeyboardShortcuts = (
   }, [enabled]);
 
   useEffect(() => {
-    if (!enabledRef.current) return;
+    // Safety check: only set up if component is mounted and enabled
+    if (!mountedRef.current || !enabledRef.current) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       // Don't trigger shortcuts when typing in inputs
@@ -48,7 +55,13 @@ export const useKeyboardShortcuts = (
 
       // Use ref to get latest shortcuts
       const currentShortcuts = shortcutsRef.current;
+      if (!currentShortcuts || !Array.isArray(currentShortcuts)) {
+        return;
+      }
+
       for (const shortcut of currentShortcuts) {
+        if (!shortcut || !shortcut.key) continue;
+
         const keyMatch = event.key.toLowerCase() === shortcut.key.toLowerCase();
         
         // Handle Cmd on Mac or Ctrl on Windows/Linux
@@ -62,13 +75,25 @@ export const useKeyboardShortcuts = (
 
         if (keyMatch && modifierMatch && shiftMatch && altMatch) {
           event.preventDefault();
-          shortcut.action();
+          if (typeof shortcut.action === "function") {
+            try {
+              shortcut.action();
+            } catch (error) {
+              // Silently fail during HMR to prevent breaking the app
+              if (import.meta.env.DEV) {
+                console.warn('Keyboard shortcut action failed:', error);
+              }
+            }
+          }
           break;
         }
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      mountedRef.current = false;
+    };
   }, []); // Empty deps - use refs for all values
 };
