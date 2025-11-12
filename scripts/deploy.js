@@ -8,7 +8,6 @@ const hre = require("hardhat");
  *   npx hardhat run scripts/deploy.js --network mumbai
  *   npx hardhat run scripts/deploy.js --network polygon
  * 
- * Make sure to set PRIVATE_KEY in .env file before deploying
  */
 async function main() {
   // Get the deployer account

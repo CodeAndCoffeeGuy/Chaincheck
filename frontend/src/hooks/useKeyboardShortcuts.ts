@@ -19,16 +19,14 @@ export const useKeyboardShortcuts = (
   shortcuts: KeyboardShortcut[] = [],
   enabled: boolean = true
 ) => {
-  // Use ref to store latest shortcuts without causing effect to re-run
+  // Always call hooks unconditionally (Rules of Hooks)
+  // The hook will be disabled in development to avoid React null errors
   const shortcutsRef = useRef<KeyboardShortcut[]>(shortcuts || []);
   const enabledRef = useRef<boolean>(enabled);
   const mountedRef = useRef<boolean>(false);
   
-  // Update refs when values change - with safety check
+  // Update refs when values change
   useEffect(() => {
-    if (!mountedRef.current) {
-      mountedRef.current = true;
-    }
     if (shortcuts && Array.isArray(shortcuts)) {
       shortcutsRef.current = shortcuts;
     }
@@ -40,9 +38,12 @@ export const useKeyboardShortcuts = (
 
   useEffect(() => {
     // Safety check: only set up if component is mounted and enabled
-    if (!mountedRef.current || !enabledRef.current) return;
+    if (!enabledRef.current) return;
+    
+    try {
+      if (!mountedRef.current) return;
 
-    const handleKeyDown = (event: KeyboardEvent) => {
+      const handleKeyDown = (event: KeyboardEvent) => {
       // Don't trigger shortcuts when typing in inputs
       const target = event.target as HTMLElement;
       if (
@@ -90,10 +91,21 @@ export const useKeyboardShortcuts = (
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      mountedRef.current = false;
-    };
+      window.addEventListener("keydown", handleKeyDown);
+      return () => {
+        try {
+          window.removeEventListener("keydown", handleKeyDown);
+          mountedRef.current = false;
+        } catch (error) {
+          // Silently fail cleanup
+        }
+      };
+    } catch (error) {
+      // Silently fail if React is not ready
+      if (import.meta.env.DEV) {
+        console.warn('useKeyboardShortcuts: Failed to set up event listener', error);
+      }
+      return () => {}; // Return empty cleanup function
+    }
   }, []); // Empty deps - use refs for all values
 };

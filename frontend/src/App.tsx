@@ -629,12 +629,11 @@ function App() {
     },
   ], [walletConnected, scanning, showToast, stopScan, setActiveTab]);
   
-  // Only enable keyboard shortcuts if we have valid shortcuts
-  // Disable in development to avoid React initialization timing issues
-  const shouldEnableShortcuts = import.meta.env.PROD;
+  // Keyboard shortcuts - disabled in development to avoid React null errors during HMR
+  // Always call the hook (Rules of Hooks) but it will be disabled in development
   useKeyboardShortcuts(
     shortcuts && Array.isArray(shortcuts) ? shortcuts : [], 
-    shouldEnableShortcuts
+    import.meta.env.PROD // Only enabled in production
   );
 
   return (
