@@ -452,6 +452,27 @@
   .about-values,
   .tech-stack {
     grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .about-step {
+    padding: 20px;
+    gap: 16px;
+  }
+
+  .step-number {
+    width: 44px;
+    height: 44px;
+    font-size: 1.5rem;
+    border-radius: 12px;
+  }
+
+  .step-content h3 {
+    font-size: 1rem;
+  }
+
+  .step-content p {
+    font-size: 0.9rem;
   }
 
   .about-cta {
@@ -460,6 +481,15 @@
 
   .about-cta .btn {
     width: 100%;
+  }
+
+  .feature-item,
+  .value-item {
+    padding: 24px 20px;
+  }
+
+  .tech-category {
+    padding: 24px 20px;
   }
 }
 
@@ -483,49 +513,133 @@
   }
 
   .about-content h3 {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
   }
 
   .about-intro {
     font-size: 1rem;
     line-height: 1.7;
     margin-bottom: 24px;
+    padding: 20px 16px;
+  }
+
+  .about-hero {
+    padding: 20px 16px;
+    margin-bottom: 32px;
   }
 
   .about-content p {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     line-height: 1.7;
     margin-bottom: 16px;
   }
 
-  .about-step,
-  .about-feature,
-  .about-value {
+  .about-steps {
+    gap: 12px;
+    margin: 24px 0;
+  }
+
+  .about-step {
+    padding: 16px;
+    gap: 12px;
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .step-number {
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+
+  .step-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .step-content h3 {
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+    margin-top: 0;
+  }
+
+  .step-content p {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .about-features,
+  .about-values,
+  .tech-stack {
+    gap: 12px;
+    margin: 24px 0;
+  }
+
+  .feature-item,
+  .value-item {
     padding: 20px 16px;
   }
 
-  .about-step h3,
-  .about-feature h3,
-  .about-value h3 {
+  .feature-item h3,
+  .value-item h3 {
     font-size: 1.125rem;
+    margin-bottom: 10px;
+  }
+
+  .feature-item p,
+  .value-item p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .feature-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 16px;
+  }
+
+  .tech-category {
+    padding: 20px 16px;
+  }
+
+  .tech-category h3 {
+    font-size: 1rem;
     margin-bottom: 12px;
   }
 
-  .about-step p,
-  .about-feature p,
-  .about-value p {
-    font-size: 0.95rem;
-    line-height: 1.7;
+  .tech-category li {
+    font-size: 0.9rem;
+    padding: 6px 0;
+  }
+
+  .about-cta {
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 32px;
   }
 
   .about-cta .btn {
     min-height: 48px;
-    font-size: 1rem;
+    font-size: 0.95rem;
     padding: 14px 24px;
+    width: 100%;
+  }
+
+  .about-footer {
+    margin-top: 48px;
+    padding-top: 24px;
   }
 
   .about-footer p {
-    font-size: 1rem;
+    font-size: 0.95rem;
+    margin: 8px 0;
+  }
+
+  .about-tagline {
+    font-size: 0.9rem !important;
   }
 }
 

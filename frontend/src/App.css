@@ -1501,19 +1501,21 @@ body {
   }
 
   .footer-links {
-    flex-direction: row;
+    flex-direction: column;
     flex-wrap: wrap;
     gap: 8px;
     justify-content: center;
+    align-items: center;
   }
 
   .footer-link {
-    font-size: 0.9rem;
-    padding: 6px 10px;
-    min-height: 36px;
+    font-size: 0.85rem;
+    padding: 8px 12px;
+    min-height: 40px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    width: auto;
   }
 
   .footer-separator {
@@ -1521,7 +1523,7 @@ body {
   }
 
   .github-link {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     margin-top: 8px;
     padding: 6px 10px;
   }
