@@ -1,6 +1,6 @@
 // Service Worker for ChainCheck PWA
-const CACHE_NAME = "chaincheck-v2";
-const RUNTIME_CACHE = "chaincheck-runtime-v2";
+const CACHE_NAME = "chaincheck-v3";
+const RUNTIME_CACHE = "chaincheck-runtime-v3";
 
 // Assets to cache on install
 const PRECACHE_ASSETS = [
